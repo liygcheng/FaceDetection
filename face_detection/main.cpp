@@ -60,6 +60,8 @@ int main(void)
 
 
 	 const google::protobuf::Descriptor* faceinfos = importer->pool()->FindMessageTypeByName("FaceInfos");
+
+
 	// const google::protobuf::FieldDescriptor* faceinfo = importer->pool()->FindFieldByName("FaceInfo");
 	// const google::protobuf::Descriptor* landmark = importer->pool()->FindMessageTypeByName("LandMark");
 	// const google::protobuf::Descriptor* box = importer->pool()->FindMessageTypeByName("BoundingBox");
