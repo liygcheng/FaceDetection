@@ -27,7 +27,7 @@ extern "C"
 #define myrandom(x) ((rand()%(x+1))*1.0/(x+1)) 
 
 
-class Distributor  // hair  dirtributor
+class Distributor  // hair  Distributor
 {
 public:
 	Distributor(const char* infolder, const char* outfolder, const int K) :m_infolder(infolder), m_outfolder(outfolder), m_K(K)
@@ -77,5 +77,39 @@ private:
 
 
 };
+
+class Detector
+{
+public:
+	
+	Detector(const char* infolder, const char* filename, const char* outfolder = NULL) :m_infolder(infolder), m_filename(filename), m_outfolder(outfolder)
+	{
+		if (!Initialize())
+		{
+			exit(-1);
+		}
+	
+	};
+	virtual ~Detector();
+
+private:
+	virtual bool Initialize(void)
+	{
+
+
+		return true;
+	}
+
+private:
+	Detector();
+
+private:
+	std::string  m_infolder;
+	std::string  m_outfolder;
+	std::string  m_filename;
+
+};
+
+
 
 

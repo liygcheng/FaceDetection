@@ -55,7 +55,7 @@ int main(void)
 #ifdef TEST_PROTOBUF
 
 	google::protobuf::compiler::Importer* importer = NULL;
-	TK::PB_Initialize("C:/Project/code/face_detection/face_detection/protobuf/", "landmark.proto",importer);
+	TK::PB_Initialize("./protobuf/", "landmark.proto",importer);
 
 
 
@@ -77,10 +77,12 @@ int main(void)
 	 const google::protobuf::Reflection* faceinfo_ref = faceinfo->GetReflection();
 
 	 faceinfo_ref->SetBool(faceinfo, faceinfo_dsc->FindFieldByName("state"), true);
+
+	 
 	 //faceinfos->GetReflection()->AddMessage(faceinfo, faceinfos_dsc->FindFieldByName("info"));/*(faceinfos, faceinfo, faceinfos_dsc->FindFieldByName("info"));*/
 
 
-	 TK::PB_Writer("liygcheng_7_6_2016",*faceinfos);
+	 TK::PB_Writer("liygcheng_7_7_2016",*faceinfos);
 
 	 //std::cout << "faceinfo name = " << faceinfo_dsc->name() << std::endl;
 

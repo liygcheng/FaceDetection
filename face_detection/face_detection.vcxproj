@@ -173,7 +173,6 @@
     <ClInclude Include="HairSelection.h" />
     <ClInclude Include="ImageRGB.h" />
     <ClInclude Include="ImageYUV.h" />
-    <ClInclude Include="protobuf\landmark.pb.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +182,6 @@
     <ClCompile Include="ImageRGB.cpp" />
     <ClCompile Include="ImageYUV.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="protobuf\landmark.pb.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

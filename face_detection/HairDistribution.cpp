@@ -163,3 +163,12 @@ void Distributor::detectKeyPoints(const std::string filename)
 
 }
 
+
+
+
+Detector::~Detector()
+{
+
+
+
+}

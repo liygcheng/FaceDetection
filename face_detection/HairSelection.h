@@ -57,6 +57,7 @@ public:
 
 
 
+
 private: // some utilities in class
 
 	HairParser(){};//forbid
