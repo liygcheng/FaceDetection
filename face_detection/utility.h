@@ -22,7 +22,7 @@
 //windows api to parse path
 //#include "landmark.pb.h"
 #include <google/protobuf/compiler/importer.h>
-
+#include <google/protobuf/dynamic_message.h>
 
 #define TK_USE_OPENMP
 

@@ -59,8 +59,30 @@ int main(void)
 
 
 
-	 const google::protobuf::Descriptor* faceinfos = importer->pool()->FindMessageTypeByName("FaceInfos");
+	 const google::protobuf::Descriptor* faceinfos_dsc = importer->pool()->FindMessageTypeByName("FaceInfos");
 
+	 const google::protobuf::Descriptor* faceinfo_dsc = importer->pool()->FindMessageTypeByName("FaceInfo");
+
+	 const google::protobuf::Descriptor* landmark_dsc = importer->pool()->FindMessageTypeByName("LandMark");
+
+	 const google::protobuf::Descriptor* box_dsc = importer->pool()->FindMessageTypeByName("BoundingBox");
+
+	// const google::protobuf::FieldDescriptor* m_state_dsc = faceinfo->FindFieldByName("state");
+
+	 google::protobuf::MessageFactory* fact = new google::protobuf::DynamicMessageFactory(importer->pool());
+
+	 google::protobuf::Message* faceinfos = fact->GetPrototype(faceinfos_dsc)->New();
+	 google::protobuf::Message* faceinfo  = fact->GetPrototype(faceinfo_dsc)->New();
+
+	 const google::protobuf::Reflection* faceinfo_ref = faceinfo->GetReflection();
+
+	 faceinfo_ref->SetBool(faceinfo, faceinfo_dsc->FindFieldByName("state"), true);
+	 //faceinfos->GetReflection()->AddMessage(faceinfo, faceinfos_dsc->FindFieldByName("info"));/*(faceinfos, faceinfo, faceinfos_dsc->FindFieldByName("info"));*/
+
+
+	 TK::PB_Writer("liygcheng_7_6_2016",*faceinfos);
+
+	 //std::cout << "faceinfo name = " << faceinfo_dsc->name() << std::endl;
 
 	// const google::protobuf::FieldDescriptor* faceinfo = importer->pool()->FindFieldByName("FaceInfo");
 	// const google::protobuf::Descriptor* landmark = importer->pool()->FindMessageTypeByName("LandMark");
