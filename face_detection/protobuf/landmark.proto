@@ -1,0 +1,30 @@
+
+
+message FaceInfo{
+	required bool state = 1;
+	required string filename = 2;
+	required string basename = 3;
+	
+	optional BoundingBox box = 4;
+		
+	repeated LandMark landmark = 5;
+}
+	message BoundingBox{
+	required sint32 startX = 1;
+	required sint32 endX = 2;
+	required sint32 startY = 3;
+	required sint32 endY = 4;
+	required uint32 width = 5;
+	required uint32 height = 6;
+	required sint32 centroidX = 7;
+	required sint32 centroidY = 8;
+	}
+	message LandMark
+	{
+	 required uint32 id =1;
+	 required sint32 X = 2;
+	 required sint32 Y = 3; 
+	}
+	message FaceInfos{
+	repeated FaceInfo info = 1;
+	}
