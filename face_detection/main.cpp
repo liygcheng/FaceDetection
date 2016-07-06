@@ -21,8 +21,8 @@
 int main(void)
 {
 
-	const char* m_infolder = "C:/Project/data/portrait/photos/";
-	const char* m_outfoler = "C:/Project/data/portrait/photos/";
+	const char* m_infolder = "D:/Arcsoft/data/portrait/big_results/results/";
+	const char* m_outfoler = "D:/Arcsoft/data/portrait/big_results/results/";
 	//CheckForPath(m_outfoler);
 
 #ifdef TEST_SELECTION
