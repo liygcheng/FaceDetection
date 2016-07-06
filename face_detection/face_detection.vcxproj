@@ -88,13 +88,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\inc;C:\Opencv\include\;C:\Opencv\include\opencv;C:\Opencv\include\opencv2;C:\Project\code\vlfeat-0.9.20-bin\vlfeat-0.9.20;.\protobuf;.\protobuf\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\inc;.\Opencv\include\;.\Opencv\include\opencv;.\Opencv\include\opencv2;.\vlfeat-0.9.20;.\protobuf;.\protobuf\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Project\code\face_detection\face_detection\lib;C:\Opencv\x86\vc12\lib;C:\Opencv\x86\vc12\staticlib;C:\Project\code\vlfeat-0.9.20-bin\vlfeat-0.9.20\bin\win32;C:\Project\code\face_detection\face_detection\protobuf\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib;.\Opencv\x86\vc12\lib;.\vlfeat-0.9.20\bin\win32;.\protobuf\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vl.lib;opencv_core2413d.lib;opencv_highgui2413d.lib;opencv_imgproc2413d.lib;ajl.lib;arcsoft_face_base.lib;arcsoft_face_detection.lib;arcsoft_face_tracking.lib;arcsoft_mobilecv.lib;funnybase2.lib;gvs.lib;libarcsoft_videooutline.lib;mpbase.lib;mpkernel.lib;pose_estimate.lib;puzzle.lib;libprotobuf.lib;libprotoc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
@@ -129,7 +129,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\inc;C:\Opencv\include\;C:\Opencv\include\opencv;C:\Opencv\include\opencv2;C:\Project\code\vlfeat-0.9.20-bin\vlfeat-0.9.20;.\protobuf;.\protobuf\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\inc;.\Opencv\include\;.\Opencv\include\opencv;.\Opencv\include\opencv2;.\vlfeat-0.9.20;.\protobuf;.\protobuf\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -138,7 +138,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Project\code\face_detection\face_detection\lib;C:\Opencv\x86\vc12\lib;C:\Opencv\x86\vc12\staticlib;C:\Project\code\vlfeat-0.9.20-bin\vlfeat-0.9.20\bin\win32;C:\Project\code\face_detection\face_detection\protobuf\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib;.\Opencv\x86\vc12\lib;.\vlfeat-0.9.20\bin\win32;.\protobuf\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vl.lib;opencv_core2413.lib;opencv_highgui2413.lib;opencv_imgproc2413.lib;ajl.lib;arcsoft_face_base.lib;arcsoft_face_detection.lib;arcsoft_face_tracking.lib;arcsoft_mobilecv.lib;funnybase2.lib;gvs.lib;libarcsoft_videooutline.lib;mpbase.lib;mpkernel.lib;pose_estimate.lib;puzzle.lib;libprotobuf.lib;libprotoc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
