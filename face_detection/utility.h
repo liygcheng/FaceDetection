@@ -45,9 +45,6 @@ namespace TK{
 
 	};
 
-
-
-
 	static void tk_copy_file(const char* in_file,const  char* out_file)
 	{
 		if (!CopyFile(in_file, out_file, FALSE))//注意：使用时将 “配置属性->常规->字符集” 改为多字节

@@ -6,7 +6,7 @@ message FaceInfo{
 	required string basename = 3;
 	
 	optional BoundingBox box = 4;
-		
+
 	repeated LandMark landmark = 5;
 }
 	message BoundingBox{

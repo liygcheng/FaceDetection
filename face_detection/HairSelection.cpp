@@ -1,7 +1,7 @@
 #include"HairSelection.h"
 
 #define MAX_PRE_ALLOCATE_SIZE 100100
-//#define  SHOWFACE
+#define  SHOWFACE
 //#define  SHOWLOGINFO
 #ifndef SHOWLOGINFO
 #define SHOWERRORINFO

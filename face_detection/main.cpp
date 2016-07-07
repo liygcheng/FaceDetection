@@ -6,7 +6,7 @@
 #include "utility.h"
 
 
-#define  TEST_PROTOBUF
+//#define  TEST_PROTOBUF
 //#define  TEST_DISTRIBUTION
 #ifndef  TEST_PROTOBUF
 #ifndef TEST_DISTRIBUTION
@@ -21,14 +21,14 @@
 int main(void)
 {
 
-	const char* m_infolder = "D:/Arcsoft/data/portrait/big_results/results/";
-	const char* m_outfoler = "D:/Arcsoft/data/portrait/big_results/results/";
+	const char* m_infolder = "C:/Project/data/portrait/selected/";
+	const char* m_outfoler = "C:/Project/data/portrait/dump/";
 	//CheckForPath(m_outfoler);
 
 #ifdef TEST_SELECTION
 	//HairParser* m_parser = new HairParser(m_infolder, m_outfoler);
 
-	//m_parser->Run();
+	//m_parser->DetectMaxFaceNum("C:/Project/data/images/song4.jpg");
 
 #endif // TEST_SELECTION
 
@@ -134,9 +134,11 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
+	 //Detector* m_detector = new Detector(m_infolder, "faceinfos.dat", m_outfoler);
+
+	 //m_detector->ElicitFilenamesFromInfolder();
 
 
-	
 
 
 	system("pause");

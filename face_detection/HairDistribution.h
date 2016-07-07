@@ -24,6 +24,9 @@ extern "C"
 #include <vl/kmeans.h>
 }
 
+#include "utility.h"
+
+
 #define myrandom(x) ((rand()%(x+1))*1.0/(x+1)) 
 
 
@@ -82,7 +85,7 @@ class Detector
 {
 public:
 	
-	Detector(const char* infolder, const char* filename, const char* outfolder = NULL) :m_infolder(infolder), m_filename(filename), m_outfolder(outfolder)
+	Detector(const char* infolder, const char* filename, const char* outfolder = "./data/") :m_infolder(infolder), m_protoname(filename), m_outfolder(outfolder)
 	{
 		if (!Initialize())
 		{
@@ -92,21 +95,71 @@ public:
 	};
 	virtual ~Detector();
 
+public:
+	inline void setInfolder(const char* infolder){ m_infolder.assign(infolder); }
+	inline void setOutfolder(const char* outfolder){ m_outfolder.assign(outfolder); }
+
+public:
+	virtual void ElicitFilenamesFromInfolder(void); // get filenames(full path) from  in folder
+	virtual void CopyImage(const std::string infile, const std::string outfile);// single file  copy
+
+	virtual void DetectMessage();
+
+
+
 private:
-	virtual bool Initialize(void)
-	{
+
+	virtual bool Initialize(void);
 
 
-		return true;
-	}
 
 private:
 	Detector();
 
 private:
+
+	//for  file 
 	std::string  m_infolder;
 	std::string  m_outfolder;
-	std::string  m_filename;
+	std::string  m_protoname;
+    std::vector<std::string>  m_filename;
+	std::vector<std::string>  m_basename;
+
+	//  for protocol  buffer archive use
+	google::protobuf::compiler::Importer* m_importer = NULL; //  for every .proto file
+
+	const google::protobuf::Descriptor* m_faceinfos_des = NULL;
+	const google::protobuf::Descriptor* m_faceinfo_des = NULL;
+	const google::protobuf::Descriptor* m_landmark_des = NULL;
+	const google::protobuf::Descriptor* m_boundingbox_des = NULL;
+
+	google::protobuf::MessageFactory * m_messageFactory = NULL;
+
+	 google::protobuf::Message* m_faceinfos = NULL;
+	 google::protobuf::Message* m_faceinfo = NULL;
+	 google::protobuf::Message* m_landmark = NULL;
+	 google::protobuf::Message* m_boundingbox = NULL;
+
+
+	const google::protobuf::Reflection* m_faceinfos_ref = NULL;
+	const google::protobuf::Reflection* m_faceinfo_ref = NULL;
+	const google::protobuf::Reflection* m_landmark_ref = NULL;
+	const google::protobuf::Reflection* m_boundingbox_ref = NULL;
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
 
 };
 
