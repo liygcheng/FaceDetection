@@ -287,7 +287,7 @@ void Detector::DetectMessage(void)
 		if ((!m_image.data) || (m_image.channels() != 3)) // state = false;
 		{
 			m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"),false);
-
+			m_faceinfos_ref->AddMessage(m_faceinfo, m_faceinfos_des->FindFieldByName("FaceInfo"), m_messageFactory);
 			continue;
 		}
 
@@ -303,6 +303,8 @@ void Detector::DetectMessage(void)
 		{
 			m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"),false);
 
+			m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("FaceInfo"), m_messageFactory);
+			
 			continue;
 		}
 
@@ -310,8 +312,28 @@ void Detector::DetectMessage(void)
 		m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"), true);
 
 
+		// Set up bounding box
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startX"), m_rect[0].tl().x);
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startY"), m_rect[0].tl().y);
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endX"), m_rect[0].br().x);
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endY"), m_rect[0].tl().y);
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x)/2);
+		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y)/2);
+
+		m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
+		m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
+		
+		m_faceinfos_ref->SetAllocatedMessage(m_faceinfos, m_boundingbox, m_faceinfos_des->FindFieldByName("BoundingBox"));
+
+
 		vecP2d  m_keyPoints;
 		CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
+
+		size_t key_len = m_keyPoints.size();
+		if (key_len == 0)
+		{
+
+		}
 
 		
 
