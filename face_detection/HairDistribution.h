@@ -85,7 +85,7 @@ class Detector
 {
 public:
 	
-	Detector(const char* infolder, const char* filename, const char* outfolder = "./data/") :m_infolder(infolder), m_protoname(filename), m_outfolder(outfolder)
+	Detector(const char* infolder, const char* filename, const char* outfolder = "./data/") :m_infolder(infolder), m_dumpname(filename), m_outfolder(outfolder)
 	{
 		if (!Initialize())
 		{
@@ -121,7 +121,8 @@ private:
 	//for  file 
 	std::string  m_infolder;
 	std::string  m_outfolder;
-	std::string  m_protoname;
+	//std::string  m_protoname;
+	std::string  m_dumpname;
     std::vector<std::string>  m_filename;
 	std::vector<std::string>  m_basename;
 

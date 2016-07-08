@@ -21,8 +21,8 @@
 int main(void)
 {
 
-	const char* m_infolder = "C:/Project/data/portrait/selected/";
-	const char* m_outfoler = "C:/Project/data/portrait/dump/";
+	const char* m_infolder = "C:/Project/data/images/";
+	const char* m_outfoler = "C:/Project/data/";
 	//CheckForPath(m_outfoler);
 
 #ifdef TEST_SELECTION
@@ -134,11 +134,11 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 //Detector* m_detector = new Detector(m_infolder, "faceinfos.dat", m_outfoler);
+	 Detector* m_detector = new Detector(m_infolder, "faceinfos.dat", m_outfoler);
 
-	 //m_detector->ElicitFilenamesFromInfolder();
+	 m_detector->ElicitFilenamesFromInfolder();
 
-
+	 m_detector->DetectMessage();
 
 
 	system("pause");
