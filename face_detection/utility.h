@@ -103,7 +103,7 @@ namespace TK{
 	
 	}
 
-	static bool PB_Writer(const char* filename,const google::protobuf::Message& message)
+	static bool PB_Writer(const char* filename,google::protobuf::Message*& message)
 	 {
 		 std::string rootpath("./data/");
 		 rootpath = rootpath.append(filename);
@@ -111,11 +111,11 @@ namespace TK{
 		 
 		 std::fstream outfile(rootpath, std::ios::out | std::ios::binary);
 		 
-		 if (!message.SerializeToOstream(&outfile)) {
+		 if (!message->SerializeToOstream(&outfile)) {
 			 std::cerr << "Failed to write msg." << std::endl;
 			 return false;
 		 }
-		
+		 outfile.close();
 		 return true;
 	 }
 
@@ -124,7 +124,7 @@ namespace TK{
 		std::string rootpath("./data/");
 		rootpath = rootpath.append(filename);
 
-		std::fstream input(rootpath, std::ios::in | std::ios::binary);
+		std::fstream input(rootpath, std::ios::in | std::ios::binary );
 		 if (!message.ParseFromIstream(&input)) {
 			 std::cerr << "Failed to parse message." << std::endl;
 			 return false;

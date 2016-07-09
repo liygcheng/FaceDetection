@@ -1,7 +1,7 @@
 #include "HairDistribution.h"
 
 //#define  SHOW_KEY_POINTS
-
+#define LOG_INFO
 //Distributor Class
 Distributor::~Distributor()
 {
@@ -264,9 +264,6 @@ void Detector::DetectMessage(void)
 
 	assert(file_len);
 
-	m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
-
-	m_faceinfos_ref = m_faceinfos->GetReflection();
 
 //#pragma  omp parallel for
 	for (size_t i = 0; i < file_len; ++i)
@@ -358,6 +355,8 @@ void Detector::DetectMessage(void)
 			m_landmark_ref->SetInt32(m_landmark, m_landmark_des->FindFieldByName("Y"), static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
 			m_faceinfo_ref->AddMessage(m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"));
 
+
+
 		}
 
 		//m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByNumber(1));
@@ -366,13 +365,34 @@ void Detector::DetectMessage(void)
 
 
 		m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"), true);
+
+
 		m_faceinfo_ref->SetString(m_faceinfo, m_faceinfo_des->FindFieldByName("filename"), filename); //
 		m_faceinfo_ref->SetString(m_faceinfo, m_faceinfo_des->FindFieldByName("basename"), basename); //
+
+		//TK::PB_Writer(m_dumpname.c_str(), *m_faceinfo);
 		
 		m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"));
 
 
+		//Log info
 
+#ifdef  LOG_INFO
+
+		std::cout << "faceinfo->state = " << m_faceinfo_ref->GetBool(*m_faceinfo, m_faceinfo_des->FindFieldByName("state")) << std::endl;
+		std::cout << "faceinfo->filename = " << m_faceinfo_ref->GetString(*m_faceinfo, m_faceinfo_des->FindFieldByName("filename")) << std::endl;
+		std::cout << "faceinfo->base = " << m_faceinfo_ref->GetString(*m_faceinfo, m_faceinfo_des->FindFieldByName("basename")) << std::endl;
+
+
+		//m_faceinfo_ref->GetRepeatedMessage(*m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"), 68);
+		
+		std::cout << "SpaceUsed cout = " << m_faceinfo_ref->SpaceUsed(*m_faceinfo) << std::endl;
+		std::cout << "SpaceUsed cout = " << m_faceinfos_ref->SpaceUsed(*m_faceinfos) << std::endl;
+
+
+
+		//Log info
+#endif
 		//filename.clear();
 		//basename.clear();
 		m_image.release();
@@ -385,7 +405,7 @@ void Detector::DetectMessage(void)
 
 
 
-	TK::PB_Writer(m_dumpname.c_str(), *m_faceinfos);
+	TK::PB_Writer(m_dumpname.c_str(), m_faceinfos);
 
 
 	//  step 2:  assign message
