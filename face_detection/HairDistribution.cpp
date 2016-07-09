@@ -413,27 +413,8 @@ void Detector::DetectMessage(void)
 
 	TK::PB_Writer(m_dumpname.c_str(), m_faceinfos);
 
+	Clear();
 
-	//  step 2:  assign message
-
-	//cv::Mat m_image = cv::imread(filename);
-	//if (!m_image.data)
-	//	return;
-
-	//if (m_image.channels() != 3)  //  get rid of non-color  images
-	//	return;
-
-	//for some check
-	//vecR m_rect;
-
-	//int w = m_image.cols - (m_image.cols & 1);
-	//int h = m_image.rows - (m_image.rows & 1);
-
-	//cv::Mat tmp = m_image(Rect(0, 0, w, h));
-
-	//vecP2d  m_keyPoints;
-
-	//CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
 
 #ifdef SHOW_KEY_POINTS
 
@@ -456,6 +437,13 @@ void Detector::DetectMessage(void)
 
 }
 
+bool Detector::ElicitMessage(const char* in_proto_name)
+{
+
+
+
+	return true;
+}
 
 Detector::~Detector()
 {

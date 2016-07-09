@@ -51,6 +51,10 @@ public:
 	inline int getDataNum(void){ return m_dataNum; }
 	inline vl_uint32 * & getAssignment(void){ return m_dataAssignment; }
 	void detectKeyPoints(const std::string filename);
+
+	
+
+
 private:
 	Distributor(); // forbid
 	bool initialConfig(void);
@@ -105,7 +109,18 @@ public:
 
 	virtual void DetectMessage();
 
+	virtual bool ElicitMessage(const char* in_proto_name);
 
+
+	inline void Clear(void){
+
+		m_filename.clear();
+	    m_basename.clear();
+
+
+		if(!m_faceinfos) m_faceinfos->Clear();
+
+	}
 
 private:
 
