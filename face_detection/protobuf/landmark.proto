@@ -1,4 +1,6 @@
-
+	message FaceInfos{
+	repeated FaceInfo info = 1;
+	}
 
 message FaceInfo{
 	required bool state = 1;
@@ -24,7 +26,4 @@ message FaceInfo{
 	 required uint32 id =1;
 	 required sint32 X = 2;
 	 required sint32 Y = 3; 
-	}
-	message FaceInfos{
-	repeated FaceInfo info = 1;
 	}

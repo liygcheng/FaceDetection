@@ -176,15 +176,30 @@ bool Detector::Initialize(void)
 
 	//protobuf initial
 
-	TK::PB_Initialize("./protobuf", "landmark.proto", m_importer);
+	//
 
-	m_faceinfos_des = m_importer->pool()->FindMessageTypeByName("FaceInfos");
-	m_faceinfo_des = m_importer->pool()->FindMessageTypeByName("FaceInfo");
-	m_landmark_des = m_importer->pool()->FindMessageTypeByName("LandMark");
-	m_boundingbox_des = m_importer->pool()->FindMessageTypeByName("BoundingBox");
+	TK::PBErrorCollector errorCollector;
+	google::protobuf::compiler::DiskSourceTree diskSourceTree;
 
 
-	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_importer->pool());
+	m_importer = new google::protobuf::compiler::Importer(&diskSourceTree, &errorCollector);
+
+	diskSourceTree.MapPath("", "./protobuf");
+
+	m_filedescripter = m_importer->Import("landmark.proto");
+
+	//TK::PB_Initialize("./protobuf", "landmark.proto", m_importer,m_filedescripter);
+
+	//
+
+
+	m_faceinfos_des = m_filedescripter->pool()->FindMessageTypeByName("FaceInfos");
+	m_faceinfo_des = m_filedescripter->pool()->FindMessageTypeByName("FaceInfo");
+	m_landmark_des = m_filedescripter->pool()->FindMessageTypeByName("LandMark");
+	m_boundingbox_des = m_filedescripter->pool()->FindMessageTypeByName("BoundingBox");
+
+
+	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedescripter->pool());
 
 	m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
 	//m_faceinfo = m_messageFactory->GetPrototype(m_faceinfo_des)->New();
@@ -353,7 +368,7 @@ void Detector::DetectMessage(void)
 			m_landmark_ref->SetUInt32(m_landmark, m_landmark_des->FindFieldByName("id"), k+1);
 			m_landmark_ref->SetInt32(m_landmark, m_landmark_des->FindFieldByName("X"), static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
 			m_landmark_ref->SetInt32(m_landmark, m_landmark_des->FindFieldByName("Y"), static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
-			m_faceinfo_ref->AddMessage(m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"));
+			m_faceinfo_ref->AddMessage(m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"), m_messageFactory);
 
 
 
@@ -372,7 +387,7 @@ void Detector::DetectMessage(void)
 
 		//TK::PB_Writer(m_dumpname.c_str(), *m_faceinfo);
 		
-		m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"));
+		m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"), m_messageFactory);
 
 
 		//Log info

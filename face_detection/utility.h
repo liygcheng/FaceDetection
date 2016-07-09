@@ -89,7 +89,7 @@ namespace TK{
 
 	}
 
-	static void PB_Initialize(const char* root, const char* filename, google::protobuf::compiler::Importer*& importer){
+	static void PB_Initialize(const char* root, const char* filename, google::protobuf::compiler::Importer*& importer,const google::protobuf::FileDescriptor*& filedescripter){
 
 		TK::PBErrorCollector errorCollector ;
 		google::protobuf::compiler::DiskSourceTree diskSourceTree;
@@ -98,7 +98,8 @@ namespace TK{
 	   importer = new google::protobuf::compiler::Importer(&diskSourceTree,&errorCollector);
 
 	   diskSourceTree.MapPath("", root);
-	   importer->Import(filename);
+
+	   filedescripter = importer->Import(filename);
 
 	
 	}
@@ -119,16 +120,18 @@ namespace TK{
 		 return true;
 	 }
 
-	static bool PB_Reader(const char* filename,google::protobuf::Message& message)
+	static bool PB_Reader(const char* filename,google::protobuf::Message*& message)
 	 {
 		std::string rootpath("./data/");
 		rootpath = rootpath.append(filename);
 
 		std::fstream input(rootpath, std::ios::in | std::ios::binary );
-		 if (!message.ParseFromIstream(&input)) {
+		 if (!message->ParseFromIstream(&input)) {
 			 std::cerr << "Failed to parse message." << std::endl;
+			 input.close();
 			 return false;
 		 }
+		 input.close();
 		 return true;
 	 }
 
