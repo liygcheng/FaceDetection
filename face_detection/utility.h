@@ -107,7 +107,10 @@ namespace TK{
 	 {
 		 std::string rootpath("./data/");
 		 rootpath = rootpath.append(filename);
-		 std::fstream outfile(rootpath, std::ios::out | std::ios::trunc | std::ios::binary);
+		 std::cout << "rootpath = " << rootpath << std::endl;
+		 
+		 std::fstream outfile(rootpath, std::ios::out | std::ios::binary);
+		 
 		 if (!message.SerializeToOstream(&outfile)) {
 			 std::cerr << "Failed to write msg." << std::endl;
 			 return false;
