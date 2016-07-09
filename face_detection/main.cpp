@@ -278,13 +278,13 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 //Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
 
-	 //m_detector->ElicitFilenamesFromInfolder();
+	 m_detector->ElicitFilenamesFromInfolder();
 
-	 //m_detector->DetectMessage();
+	 m_detector->DetectMessage();
 
-	 Test();
+	// Test();
 	system("pause");
 
 	return 0;

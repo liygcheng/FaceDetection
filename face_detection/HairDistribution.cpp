@@ -176,41 +176,23 @@ bool Detector::Initialize(void)
 
 	//protobuf initial
 
-	//
-
 	TK::PBErrorCollector errorCollector;
 	google::protobuf::compiler::DiskSourceTree diskSourceTree;
-
-
 	m_importer = new google::protobuf::compiler::Importer(&diskSourceTree, &errorCollector);
 
 	diskSourceTree.MapPath("", "./protobuf");
 
-	m_filedescripter = m_importer->Import("landmark.proto");
-
-	//TK::PB_Initialize("./protobuf", "landmark.proto", m_importer,m_filedescripter);
-
-	//
+	m_filedec = m_importer->Import("landmark.proto");
 
 
-	m_faceinfos_des = m_filedescripter->pool()->FindMessageTypeByName("FaceInfos");
-	m_faceinfo_des = m_filedescripter->pool()->FindMessageTypeByName("FaceInfo");
-	m_landmark_des = m_filedescripter->pool()->FindMessageTypeByName("LandMark");
-	m_boundingbox_des = m_filedescripter->pool()->FindMessageTypeByName("BoundingBox");
 
+	m_faceinfos_des = m_filedec->pool()->FindMessageTypeByName("FaceInfos");
+	m_boundingbox_des = m_filedec->pool()->FindMessageTypeByName("BoundingBox");
 
-	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedescripter->pool());
+	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedec->pool());
 
 	m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
-	//m_faceinfo = m_messageFactory->GetPrototype(m_faceinfo_des)->New();
-	//m_landmark = m_messageFactory->GetPrototype(m_landmark_des)->New();
-	//m_boundingbox = m_messageFactory->GetPrototype(m_boundingbox_des)->New();
-
-
 	m_faceinfos_ref = m_faceinfos->GetReflection();// is this so called Reflection ?
-	//m_faceinfo_ref = m_faceinfo->GetReflection();
-	//m_landmark_ref = m_landmark->GetReflection();
-	//m_boundingbox_ref = m_boundingbox->GetReflection();
 
 	return true;
 }
@@ -284,8 +266,14 @@ void Detector::DetectMessage(void)
 	for (size_t i = 0; i < file_len; ++i)
 	{
 		std::cout << "count = " <<i<< std::endl;
-		m_faceinfo = m_messageFactory->GetPrototype(m_faceinfo_des)->New();
+
+		m_field = m_faceinfos_des->FindFieldByName("info");
+
+		m_faceinfo = m_faceinfos_ref->AddMessage(m_faceinfos, m_field);
+		m_faceinfo_des = m_faceinfo->GetDescriptor();
 		m_faceinfo_ref = m_faceinfo->GetReflection();
+
+
 
 		m_boundingbox = m_messageFactory->GetPrototype(m_boundingbox_des)->New();
 		m_boundingbox_ref = m_boundingbox->GetReflection();
@@ -295,14 +283,22 @@ void Detector::DetectMessage(void)
 		std::string basename = m_basename[i];
 
 
-		
+		m_field = m_faceinfo_des->FindFieldByName("filename");
+
+		m_faceinfo_ref->SetString(m_faceinfo, m_field,filename);
+		m_field = m_faceinfo_des->FindFieldByName("basename");
+		m_faceinfo_ref->SetString(m_faceinfo, m_field, basename);
+
+
+
 
 		
 		cv::Mat m_image = cv::imread(filename);
 		if ((!m_image.data) || (m_image.channels() != 3)) // state = false;
 		{
-			m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"),false);
-			m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"));
+			m_field = m_faceinfo_des->FindFieldByName("state");
+			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+			
 			continue;
 		}
 
@@ -317,10 +313,8 @@ void Detector::DetectMessage(void)
 
 		if (m_rect.size() != 1)
 		{
-			m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"),false);
-
-			m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"));
-			
+			m_field = m_faceinfo_des->FindFieldByName("state");
+			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
 			continue;
 		}
 
@@ -340,11 +334,11 @@ void Detector::DetectMessage(void)
 		m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
 		
 
+		m_field = m_faceinfo_des->FindFieldByName("box");	
+		m_faceinfo_ref->SetAllocatedMessage(m_faceinfo, m_boundingbox, m_field);
 
-		m_faceinfo_ref->SetAllocatedMessage(m_faceinfo, m_boundingbox, m_faceinfo_des->FindFieldByName("box"));
-
-		//m_faceinfo_ref->MutableMessage(m_faceinfo, m_faceinfos_des->FindFieldByName("box"));
-		
+	
+	
 		
 		vecP2d  m_keyPoints;
 		CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
@@ -354,40 +348,37 @@ void Detector::DetectMessage(void)
 		size_t key_len = m_keyPoints.size();
 		if (key_len == 0)
 		{
-			m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"), false);
-
-			m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"));
-
+			m_field = m_faceinfo_des->FindFieldByName("state");
+			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
 			continue;
 		}
 
 		for (size_t k = 0; k < key_len; ++k)
 		{
-			m_landmark = m_messageFactory->GetPrototype(m_landmark_des)->New();
+			m_field = m_faceinfo_des->FindFieldByName("landmark");
+
+			m_landmark = m_faceinfo_ref->AddMessage(m_faceinfo, m_field);
+			m_landmark_des = m_landmark->GetDescriptor();
 			m_landmark_ref = m_landmark->GetReflection();
-			m_landmark_ref->SetUInt32(m_landmark, m_landmark_des->FindFieldByName("id"), k+1);
-			m_landmark_ref->SetInt32(m_landmark, m_landmark_des->FindFieldByName("X"), static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
-			m_landmark_ref->SetInt32(m_landmark, m_landmark_des->FindFieldByName("Y"), static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
-			m_faceinfo_ref->AddMessage(m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"), m_messageFactory);
+
+			m_field = m_landmark_des->FindFieldByName("id");
+			m_landmark_ref->SetUInt32(m_landmark, m_field, k + 1);
+
+			m_field = m_landmark_des->FindFieldByName("X");
+			m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
+
+			m_field = m_landmark_des->FindFieldByName("Y");
+			m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
+			
 
 
 
 		}
 
-		//m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByNumber(1));
 
-		//m_faceinfos_ref->MutableRepeatedMessage(m_faceinfos, m_faceinfos_des->FindFieldByName())
+		m_field = m_faceinfo_des->FindFieldByName("state");
+		m_faceinfo_ref->SetBool(m_faceinfo, m_field, true);
 
-
-		m_faceinfo_ref->SetBool(m_faceinfo, m_faceinfo_des->FindFieldByName("state"), true);
-
-
-		m_faceinfo_ref->SetString(m_faceinfo, m_faceinfo_des->FindFieldByName("filename"), filename); //
-		m_faceinfo_ref->SetString(m_faceinfo, m_faceinfo_des->FindFieldByName("basename"), basename); //
-
-		//TK::PB_Writer(m_dumpname.c_str(), *m_faceinfo);
-		
-		m_faceinfos_ref->AddMessage(m_faceinfos, m_faceinfos_des->FindFieldByName("info"), m_messageFactory);
 
 
 		//Log info

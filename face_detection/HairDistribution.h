@@ -128,8 +128,8 @@ private:
 
 	//  for protocol  buffer archive use
 	google::protobuf::compiler::Importer* m_importer = NULL; //  for every .proto file
-	const google::protobuf::FileDescriptor* m_filedescripter = NULL;
-
+	const google::protobuf::FileDescriptor* m_filedec = NULL;
+	const google::protobuf::FieldDescriptor* m_field = NULL;
 
 	const google::protobuf::Descriptor* m_faceinfos_des = NULL;
 	const google::protobuf::Descriptor* m_faceinfo_des = NULL;
