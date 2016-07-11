@@ -439,12 +439,6 @@ void Detector::DetectMessage(void)
 
 
 
-
-
-
-
-
-
 	}
 
 	system("pause");
