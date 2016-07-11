@@ -278,10 +278,24 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 Detector* m_detector = new Detector(m_infolder, "faceinfos_2016_7_11", m_outfoler);
+	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
 
 	 m_detector->ElicitFilenamesFromInfolder();
 
+	 //m_detector->Clear();
+
+	 //m_detector->ElicitMessage("faceinfos_2016_7_11");
+
+	 //google::protobuf::Message*  msg = m_detector->GetMessagePointer();
+
+	 //const google::protobuf::Descriptor* msgdec = msg->GetDescriptor();
+
+	 //const google::protobuf::Reflection* msgref = msg->GetReflection();
+
+	 //std::cout << ""<<msgref->GetString(*msg,msgdec->FindFieldByName("rootFolder")) << std::endl;
+
+	 //std::cout << "number of FaceInfo:"<<msgref->FieldSize(*msg,msgdec->FindFieldByName("info")) << std::endl;
+	 
 	 m_detector->DetectMessage();
 
 	// Test();

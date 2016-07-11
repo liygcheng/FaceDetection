@@ -191,10 +191,7 @@ bool Detector::Initialize(void)
 
 	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedec->pool());
 
-	m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
-	m_faceinfos_ref = m_faceinfos->GetReflection();// is this so called Reflection ?
 
-	m_faceinfos_ref->SetString(m_faceinfos, m_faceinfos_des->FindFieldByCamelcaseName("rootFolder"), m_infolder);
 
 	return true;
 }
@@ -263,127 +260,158 @@ void Detector::DetectMessage(void)
 
 	assert(file_len);
 
+	size_t max_batch_num = file_len / (PATCH_WISE_NUM);
 
-//#pragma  omp parallel for
-	for (size_t i = 0; i < file_len; ++i)
+	time_t td = time(0);
+	tm* ltm = localtime(&td);
+
+	
+	for (size_t batch_num = 0; batch_num <= max_batch_num; ++batch_num)
 	{
-		std::cout << "count = " <<i<< std::endl;
-
-		m_field = m_faceinfos_des->FindFieldByName("info");
-
-		m_faceinfo = m_faceinfos_ref->AddMessage(m_faceinfos, m_field);
-		m_faceinfo_des = m_faceinfo->GetDescriptor();
-		m_faceinfo_ref = m_faceinfo->GetReflection();
-
-
-
-		m_boundingbox = m_messageFactory->GetPrototype(m_boundingbox_des)->New();
-		m_boundingbox_ref = m_boundingbox->GetReflection();
-	
-
-		std::string filename = m_filename[i];
-		std::string basename = m_basename[i];
-
-
-		//m_field = m_faceinfo_des->FindFieldByName("filename");
-
-		//m_faceinfo_ref->SetString(m_faceinfo, m_field,filename);
-		m_field = m_faceinfo_des->FindFieldByName("basename");
-		m_faceinfo_ref->SetString(m_faceinfo, m_field, basename);
-
-
-
 
 		
-		cv::Mat m_image = cv::imread(filename);
-		if ((!m_image.data) || (m_image.channels() != 3)) // state = false;
-		{
-			m_field = m_faceinfo_des->FindFieldByName("state");
-			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
-			
+		//////////////////////////////////////////////////////////////////////////
+		size_t  startIdx = batch_num * PATCH_WISE_NUM;
+
+		size_t  endIdx = std::min(std::max((size_t)0,(batch_num + 1)*PATCH_WISE_NUM - 1), file_len-1);
+
+
+		std::vector<std::string>  subfilename(&m_filename[startIdx], &m_filename[endIdx]);
+		std::vector<std::string>  subbasename(&m_basename[startIdx], &m_basename[endIdx]);
+
+		char* subname = new char[256]; //batch dump name
+		std::string tmp;
+		std::sprintf(subname, tmp.append(m_dumpname).append("_%d-%d_%d_%d_%d").c_str(),\
+			startIdx, endIdx, ltm->tm_mon + 1, ltm->tm_mday,ltm->tm_year+1900);
+
+
+		std::fstream _file;  // if it already exists
+		_file.open(subname, std::ios::in);
+		if (_file){
+			std::cout << "File "<<subname<<" already exists.\n" << std::endl;
+			_file.close();
 			continue;
 		}
 
 
-		int w = m_image.cols - (m_image.cols & 1);
-		int h = m_image.rows - (m_image.rows & 1);
-		cv::Mat tmp = m_image(Rect(0, 0, w, h));
+		//////////////////////////////////////////////////////////////////////////
+
+		//std::cout << "subname = " << subname << std::endl;
+		//////////////////////////////////Log info////////////////////////////////////////
+
+		std::cout << "Handling Batch " << batch_num+1<<" ----->"<<subname << std::endl;
+
+		/////////////////////////////////Log info//////////////////////////////////////
+
+		size_t len = subbasename.size();
+
+		m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
+		m_faceinfos_ref = m_faceinfos->GetReflection();// is this so called Reflection ?
+
+		m_faceinfos_ref->SetString(m_faceinfos, m_faceinfos_des->FindFieldByCamelcaseName("rootFolder"), m_infolder);
 
 
-		vecR m_rect;
-		CxFaceDA::ArcSoftFaceDetection(tmp,2, 5, m_rect);
-
-		if (m_rect.size() != 1)
+		for (size_t i = 0; i < len; ++i)
 		{
+			if (i%100 ==0 )
+			std::cout << "count = " << i << std::endl;
+
+			m_field = m_faceinfos_des->FindFieldByName("info");
+
+			m_faceinfo = m_faceinfos_ref->AddMessage(m_faceinfos, m_field);
+			m_faceinfo_des = m_faceinfo->GetDescriptor();
+			m_faceinfo_ref = m_faceinfo->GetReflection();
+
+
+			m_boundingbox = m_messageFactory->GetPrototype(m_boundingbox_des)->New();
+			m_boundingbox_ref = m_boundingbox->GetReflection();
+
+
+			std::string filename = subfilename[i];
+			std::string basename = subbasename[i];
+
+			m_field = m_faceinfo_des->FindFieldByName("basename");
+			m_faceinfo_ref->SetString(m_faceinfo, m_field, basename);
+
+			cv::Mat m_image = cv::imread(filename);
+			if ((!m_image.data) || (m_image.channels() != 3)) // state = false;
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+
+				continue;
+			}
+
+
+			int w = m_image.cols - (m_image.cols & 1);
+			int h = m_image.rows - (m_image.rows & 1);
+			cv::Mat tmp = m_image(Rect(0, 0, w, h));
+
+
+			vecR m_rect;
+			CxFaceDA::ArcSoftFaceDetection(tmp, 2, 5, m_rect);
+
+			if (m_rect.size() != 1)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+				continue;
+			}
+
+			//std::cout <<" sx = "<< m_rect[0].tl().x << " sy = " << m_rect[0].tl().y<< std::endl;
+			//std::cout << " ex = " << m_rect[0].br().x << " ey = " << m_rect[0].br().y << std::endl;
+
+
+			// Set up bounding box
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startX"), m_rect[0].tl().x);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startY"), m_rect[0].tl().y);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endX"), m_rect[0].br().x);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endY"), m_rect[0].br().y);
+			//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x) / 2);
+			//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y) / 2);
+			//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
+			//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
+
+			m_field = m_faceinfo_des->FindFieldByName("box");
+			m_faceinfo_ref->SetAllocatedMessage(m_faceinfo, m_boundingbox, m_field);
+
+			vecP2d  m_keyPoints;
+			CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
+
+			size_t key_len = m_keyPoints.size();
+			if (key_len == 0)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+				continue;
+			}
+
+			for (size_t k = 0; k < key_len; ++k)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("landmark");
+
+				m_landmark = m_faceinfo_ref->AddMessage(m_faceinfo, m_field);
+				m_landmark_des = m_landmark->GetDescriptor();
+				m_landmark_ref = m_landmark->GetReflection();
+
+				m_field = m_landmark_des->FindFieldByName("id");
+				m_landmark_ref->SetUInt32(m_landmark, m_field, k + 1);
+
+				m_field = m_landmark_des->FindFieldByName("X");
+				m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
+
+				m_field = m_landmark_des->FindFieldByName("Y");
+				m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
+
+			}
+
+
 			m_field = m_faceinfo_des->FindFieldByName("state");
-			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
-			continue;
-		}
-
-
-	
-
-
-		// Set up bounding box
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startX"), m_rect[0].tl().x);
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startY"), m_rect[0].tl().y);
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endX"), m_rect[0].br().x);
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endY"), m_rect[0].tl().y);
-		//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x) / 2);
-		//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y) / 2);
-
-		//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
-		//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
-		
-
-		m_field = m_faceinfo_des->FindFieldByName("box");	
-		m_faceinfo_ref->SetAllocatedMessage(m_faceinfo, m_boundingbox, m_field);
-
-	
-	
-		
-		vecP2d  m_keyPoints;
-		CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
+			m_faceinfo_ref->SetBool(m_faceinfo, m_field, true);
 
 
 
-		size_t key_len = m_keyPoints.size();
-		if (key_len == 0)
-		{
-			m_field = m_faceinfo_des->FindFieldByName("state");
-			m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
-			continue;
-		}
-
-		for (size_t k = 0; k < key_len; ++k)
-		{
-			m_field = m_faceinfo_des->FindFieldByName("landmark");
-
-			m_landmark = m_faceinfo_ref->AddMessage(m_faceinfo, m_field);
-			m_landmark_des = m_landmark->GetDescriptor();
-			m_landmark_ref = m_landmark->GetReflection();
-
-			m_field = m_landmark_des->FindFieldByName("id");
-			m_landmark_ref->SetUInt32(m_landmark, m_field, k + 1);
-
-			m_field = m_landmark_des->FindFieldByName("X");
-			m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
-
-			m_field = m_landmark_des->FindFieldByName("Y");
-			m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
-			
-
-
-
-		}
-
-
-		m_field = m_faceinfo_des->FindFieldByName("state");
-		m_faceinfo_ref->SetBool(m_faceinfo, m_field, true);
-
-
-
-		//Log info
+			//Log info
 
 #ifdef  LOG_INFO
 
@@ -391,24 +419,39 @@ void Detector::DetectMessage(void)
 
 
 
-		//Log info
+			//Log info
 #endif
-		//filename.clear();
-		//basename.clear();
-		m_image.release();
-		m_rect.clear();
-		m_keyPoints.clear();
-		tmp.release();
+			//filename.clear();
+			//basename.clear();
+			m_image.release();
+			m_rect.clear();
+			m_keyPoints.clear();
+			tmp.release();
+
+		}
+
+
+
+
+		TK::PB_Writer(subname, m_faceinfos);
+
+		Clear();
+
+
+
+
+
+
+
+
 
 	}
 
+	system("pause");
+//#pragma  omp parallel for
 
 
-
-	TK::PB_Writer(m_dumpname.c_str(), m_faceinfos);
-
-	Clear();
-
+	
 
 #ifdef SHOW_KEY_POINTS
 
@@ -433,11 +476,39 @@ void Detector::DetectMessage(void)
 
 bool Detector::ElicitMessage(const char* in_proto_name)
 {
+	//TK::PBErrorCollector errorCollector;
+	//google::protobuf::compiler::DiskSourceTree diskSourceTree;
+	//m_importer = new google::protobuf::compiler::Importer(&diskSourceTree, &errorCollector);
 
+	//diskSourceTree.MapPath("", "./protobuf");
+
+	//m_filedec = m_importer->Import("landmark.proto");
+
+
+
+	//m_faceinfos_des = m_filedec->pool()->FindMessageTypeByName("FaceInfos");
+	//m_boundingbox_des = m_filedec->pool()->FindMessageTypeByName("BoundingBox");
+
+	//m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedec->pool());
+
+	TK::PB_Reader(in_proto_name, m_faceinfos);
 
 
 	return true;
 }
+
+
+/************************************************************************/
+/*  Multi Thread Detect                                                                     */
+/************************************************************************/
+void* Detector::PartialDetectMessage(void* reg){
+	
+	return NULL;
+}
+
+
+
+
 
 Detector::~Detector()
 {

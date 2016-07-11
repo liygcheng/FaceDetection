@@ -16,7 +16,7 @@ Email: liygcheng@zju.edu.cn
 #include <io.h>
 #include <opencv.hpp>
 #include "CxFaceDA.h"
-
+#include <time.h>
 
 extern "C"
 {
@@ -122,16 +122,32 @@ public:
 
 	}
 
+
+	inline google::protobuf::Message* & GetMessagePointer()
+	{
+		return m_faceinfos;
+	}
+		
+	
+	static  void*  PartialDetectMessage(void* reg);
+
 private:
 
 	virtual bool Initialize(void);
 
+	
 
 
 private:
 	Detector();
 
 private:
+
+	enum 
+	{
+		PATCH_WISE_NUM = 10000,
+		MAX_THREADS_NUM = 10
+	};
 
 	//for  file 
 	std::string  m_infolder;

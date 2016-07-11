@@ -3,12 +3,12 @@
 	repeated FaceInfo info = 2;
 	}
 
-message FaceInfo{
-	required bool state = 1;
-	required string basename = 2;
-	optional BoundingBox box = 3;
-	repeated LandMark landmark = 4;
-}
+	message FaceInfo{
+		required bool state = 1;
+		required string basename = 2;
+		optional BoundingBox box = 3;
+		repeated LandMark landmark = 4;
+	}
 	message BoundingBox{
 	required sint32 startX = 1;
 	required sint32 endX = 2;

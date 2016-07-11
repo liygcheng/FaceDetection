@@ -249,16 +249,6 @@ void HairParser::CopyImage(const std::string infile, const std::string outfile)
 
 }
 
-//void HairParser::CopyFiles(const std::string infolder, const std::string outfolder)
-//{
-//
-//}
-//
-//void HairParser::CopyFiles(const std::vector<std::string> fileVec, const std::string outfolder)
-//{
-//
-//
-//}
 
 
 //deconstructor
