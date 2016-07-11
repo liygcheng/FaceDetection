@@ -280,20 +280,17 @@ void Detector::DetectMessage(void)
 		std::vector<std::string>  subbasename(&m_basename[startIdx], &m_basename[endIdx]);
 
 		char* subname = new char[256]; //batch dump name
+		memset(subname,0,sizeof(subname));
 		std::string tmp;
-		std::sprintf(subname, tmp.append(m_dumpname).append("_%d-%d_%d_%d_%d").c_str(),\
-			startIdx, endIdx, ltm->tm_mon + 1, ltm->tm_mday,ltm->tm_year+1900);
+		std::sprintf(subname, tmp.append("./data/FaceInfos/").append(m_dumpname).append("_%d-%d_%d_%d_%d").c_str(),startIdx, endIdx, ltm->tm_mon + 1, ltm->tm_mday,ltm->tm_year+1900);
 
-
-		std::fstream _file;  // if it already exists
-		_file.open(subname, std::ios::in);
-		if (_file){
-			std::cout << "File "<<subname<<" already exists.\n" << std::endl;
-			_file.close();
+		if (_access(subname, 0) != -1)
+		{
+			std::cout << "File " << subname << " already exists.\n" << std::endl;
 			continue;
 		}
-
-
+	
+		
 		//////////////////////////////////////////////////////////////////////////
 
 		//std::cout << "subname = " << subname << std::endl;
@@ -313,7 +310,7 @@ void Detector::DetectMessage(void)
 
 		for (size_t i = 0; i < len; ++i)
 		{
-			if (i%100 ==0 )
+			//if (i% ==0 )
 			std::cout << "count = " << i << std::endl;
 
 			m_field = m_faceinfos_des->FindFieldByName("info");
@@ -434,13 +431,13 @@ void Detector::DetectMessage(void)
 
 
 		TK::PB_Writer(subname, m_faceinfos);
-
-		Clear();
+		if (!m_faceinfos) m_faceinfos->Clear();
+		//Clear();
 
 
 
 	}
-
+	Clear();
 	system("pause");
 //#pragma  omp parallel for
 
@@ -500,10 +497,6 @@ void* Detector::PartialDetectMessage(void* reg){
 	return NULL;
 }
 
-
-
-
-
 Detector::~Detector()
 {
 
@@ -511,3 +504,84 @@ Detector::~Detector()
 	m_basename.clear();
 
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
+//
+//
+//bool FileParser::Initial(void){
+//
+//
+//	m_fileNum = TK::tk_get_filenames(m_infolder.c_str(), m_totalImageName, "jpg");
+//
+//	TK::PBErrorCollector errorCollector;
+//	google::protobuf::compiler::DiskSourceTree diskSourceTree;
+//	m_importer = new google::protobuf::compiler::Importer(&diskSourceTree, &errorCollector);
+//
+//	diskSourceTree.MapPath("", "./protobuf");
+//	m_filedes = m_importer->Import("filenames.proto");
+//
+//	m_messageFactory = new google::protobuf::DynamicMessageFactory(m_filedes->pool());
+//
+//	m_ImagePatchDesc = m_filedes->pool()->FindMessageTypeByName("ImagePatch");
+//
+//	return true;
+//
+//}
+//
+//size_t FileParser::DumpImageFileNames(FileParser::DUMP_METHOD method)
+//{
+//
+//	assert(m_fileNum);
+//
+//
+//	size_t max_batch_num = m_fileNum / (PATCH_WISE_NUM);
+//	
+//
+//	switch (method)
+//	{
+//	case FileParser::USE_SPLIT_FILES:
+//
+//		for (size_t batch_num = 0; batch_num <= max_batch_num; ++batch_num)
+//		{
+//
+//			size_t startIdx = batch_num * PATCH_WISE_NUM;
+//			size_t endIdx = std::min(std::max((size_t)0, (batch_num + 1)*PATCH_WISE_NUM - 1), m_fileNum - 1);
+//
+//			std::vector<std::string>  subfilename(&m_totalImageName[startIdx], &m_totalImageName[endIdx]);
+//			char* subname = new char[256]; //batch dump name
+//			memset(subname, 0, sizeof(subname));
+//			std::string tmp(m_outfolder);
+//			std::sprintf(subname, tmp.append("%d-%d.filenames").c_str(), startIdx, endIdx);
+//			TK::tk_dump_filenames(subfilename, subname,startIdx);
+//
+//		}
+//
+//
+//
+//
+//		break;
+//
+//
+//	case FileParser::USE_PROTOBUF_DUMP:
+//
+//
+//		m_ImagePatch = m_messageFactory->GetPrototype(m_ImagePatchDesc)->New();
+//		m_ImagePatchRef = m_ImagePatch->GetReflection();
+//
+//		break;
+//
+//	default:
+//		break;
+//	}
+//
+//
+//
+//
+//
+//
+//	return (size_t)0;
+//}
+
+

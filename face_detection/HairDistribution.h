@@ -145,7 +145,7 @@ private:
 
 	enum 
 	{
-		PATCH_WISE_NUM = 10000,
+		PATCH_WISE_NUM = 1000,
 		MAX_THREADS_NUM = 10
 	};
 
@@ -196,6 +196,125 @@ private:
 
 
 };
+
+//class FileParser
+//{
+//public:
+//	FileParser(const char* infolder, const char* outfolder) :m_infolder(infolder), m_outfolder(outfolder)
+//	{
+//		if (!Initial())
+//		{
+//			std::cerr << "Can not initialize,aborting...\n" << std::endl;
+//		}
+//	 
+//	};
+//
+//	FileParser(const char* dumpname) :m_dumpname(dumpname){
+//
+//		if (!Initial())
+//		{
+//			std::cerr << "Can not initialize,aborting...\n" << std::endl;
+//		}
+//
+//
+//	}
+//
+//
+//
+//	~FileParser(){
+//		//m_filenames.clear();
+//	};
+//
+//public:
+//
+//	//
+//	enum DUMP_METHOD
+//	{
+//		USE_PROTOBUF_DUMP,
+//		USE_SPLIT_FILES
+//	};
+//
+//	//some utilities
+//
+//	inline std::string& GetPath(void){
+//		return m_infolder;
+//	}
+//	inline std::string& GetProtoName(void){
+//		return m_protoname;
+//	}
+//	inline void SetProtoName(const std::string& protoName)
+//	{
+//		m_protoname.assign(protoName);
+//	}
+//	inline void SetPath(const std::string& filepath)
+//	{
+//		m_infolder.assign(filepath);
+//	}
+//	inline size_t& GetFileNum(void)
+//	{
+//		return m_fileNum;
+//	}
+//
+//	//initial protobuf
+//
+//	bool Initial(void);
+//	//
+//	size_t DumpImageFileNames(FileParser::DUMP_METHOD method);
+//
+//
+//
+//
+//private:
+//
+//
+//	FileParser(){};//explicit forbid
+//
+//
+//private:
+//	enum 
+//	{
+//		PATCH_WISE_NUM = 2000 // 2000  images form one batch
+//	};
+//
+//
+//
+//	//  for  protobuf
+//
+//	google::protobuf::compiler::Importer* m_importer = NULL;
+//
+//	google::protobuf::Message* m_ImagePatch = NULL;
+//	google::protobuf::Message* m_PatchInfo = NULL;
+//
+//	google::protobuf::MessageFactory * m_messageFactory = NULL;
+//
+//	const google::protobuf::FileDescriptor* m_filedes = NULL;
+//	const google::protobuf::Descriptor* m_ImagePatchDesc = NULL;
+//	const google::protobuf::Descriptor* m_PatchInfoDesc = NULL;
+//	const google::protobuf::FieldDescriptor* m_field = NULL;
+//
+//	const google::protobuf::Reflection* m_ImagePatchRef = NULL;
+//	const google::protobuf::Reflection* m_PatchInfoRef = NULL;
+//
+//	
+//
+//
+//	//for   protobuf
+//	std::string m_infolder;
+//	std::string m_outfolder;
+//
+//	std::string m_protoname;
+//
+//	std::vector<std::string> m_totalImageName;
+//	//std::vector< std::vector<std::string> > m_filenames;// m_filenames[m][n] ,filenames in Batch m,location n
+//
+//	
+//
+//	size_t m_fileNum;
+//
+//	std::string m_dumpname;
+//
+//};
+
 
 
 

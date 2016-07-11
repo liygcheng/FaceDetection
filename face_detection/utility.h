@@ -45,6 +45,103 @@ namespace TK{
 
 	};
 
+	static size_t tk_get_filenames(const char* infolder, std::vector<std::string>& filenames, const char* suffix)
+	{
+
+		filenames.clear();
+		_finddata64i32_t m_file;
+		long m_lf;
+
+		std::string m_path(infolder);
+		m_path.append("/*.").append(suffix);
+
+		if ((m_lf = _findfirst(m_path.c_str(), &m_file)) == -1l)
+			std::cout << "No files  to be found! Please  check it again!" << std::endl;
+		else
+		{
+			std::cout << "File  List :" << std::endl;
+
+			while (_findnext(m_lf, &m_file) == 0)
+			{
+
+		
+				std::string tmp(infolder);
+				filenames.push_back(tmp.append("/").append(m_file.name));
+				//std::cout <<m_file.name<< std::endl;
+			}
+
+			_findclose(m_lf);
+
+		
+			filenames.erase(filenames.begin()); // get rid of dir 
+
+		}
+
+		if (!filenames.size())
+		{
+			std::cout << "found  no  file " << std::endl;
+		}
+		else
+		{
+			std::cout << "found  files : " << filenames.size() << std::endl;
+		}
+
+		return filenames.size();
+	}
+
+	static bool tk_dump_filenames(const std::vector<std::string> &filenames,const char* outname,size_t baseCount = 0){
+
+		std::ofstream out(outname);
+
+		if (!out) { std::cerr << "open file error,aborting.." << std::endl; return false; }
+
+		for (std::vector<std::string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it)
+		{
+			out << *it << " " <<(it - filenames.begin())+ baseCount<< std::endl;
+		}
+		out.close();
+
+		std::cout << "filenames dump done!" << std::endl;
+
+
+		return true;
+	}
+	
+	static bool tk_dump_piecewise_filenames(const std::vector<std::string> &filenames,const char* outfolder,size_t numPerSegment){
+
+		size_t file_len = filenames.size();
+
+		assert(file_len);
+
+		size_t max_batch_num = file_len / (numPerSegment);
+
+		for (size_t batch_num = 0; batch_num <= max_batch_num; ++batch_num)
+		{
+
+			size_t startIdx = batch_num * numPerSegment;
+			size_t endIdx = min(max((size_t)0, (batch_num + 1)*numPerSegment - 1), file_len - 1);
+
+			std::vector<std::string>  subfilename(&filenames[startIdx], &filenames[endIdx]);
+			char* subname = new char[256]; //batch dump name
+			memset(subname, 0, sizeof(subname));
+			std::string tmp(outfolder);
+			std::sprintf(subname, tmp.append("%d-%d.filenames").c_str(), startIdx, endIdx);
+
+			if (_access(subname, 0) != -1)
+			{
+				std::cout << "File " << subname << " already exists.\n" << std::endl;
+				continue;
+			}
+
+			TK::tk_dump_filenames(subfilename, subname, startIdx);
+
+		}
+
+
+
+		return true;
+	}
+
 	static void tk_copy_file(const char* in_file,const  char* out_file)
 	{
 		if (!CopyFile(in_file, out_file, FALSE))//注意：使用时将 “配置属性->常规->字符集” 改为多字节
@@ -106,11 +203,10 @@ namespace TK{
 
 	static bool PB_Writer(const char* filename,google::protobuf::Message*& message)
 	 {
-		 std::string rootpath("./data/");
-		 rootpath = rootpath.append(filename);
-		 std::cout << "rootpath = " << rootpath << std::endl;
+
+		 std::cout << "filename = " << filename << std::endl;
 		 
-		 std::fstream outfile(rootpath, std::ios::out | std::ios::binary);
+		 std::fstream outfile(filename, std::ios::out | std::ios::binary);
 		 
 		 if (!message->SerializeToOstream(&outfile)) {
 			 std::cerr << "Failed to write msg." << std::endl;
@@ -122,10 +218,9 @@ namespace TK{
 
 	static bool PB_Reader(const char* filename,google::protobuf::Message*& message)
 	 {
-		std::string rootpath("./data/");
-		rootpath = rootpath.append(filename);
 
-		std::fstream input(rootpath, std::ios::in | std::ios::binary );
+
+		std::fstream input(filename, std::ios::in | std::ios::binary);
 		 if (!message->ParseFromIstream(&input)) {
 			 std::cerr << "Failed to parse message." << std::endl;
 			 input.close();

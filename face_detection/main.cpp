@@ -278,9 +278,9 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+	 //Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
 
-	 m_detector->ElicitFilenamesFromInfolder();
+	 //m_detector->ElicitFilenamesFromInfolder();
 
 	 //m_detector->Clear();
 
@@ -296,10 +296,24 @@ int main(void)
 
 	 //std::cout << "number of FaceInfo:"<<msgref->FieldSize(*msg,msgdec->FindFieldByName("info")) << std::endl;
 	 
-	 m_detector->DetectMessage();
+	 //m_detector->DetectMessage();
 
 	// Test();
-	system("pause");
 
-	return 0;
+	 std::vector<std::string> filenames;
+
+	 TK::tk_get_filenames(m_infolder, filenames, "jpg");
+
+	 TK::tk_dump_piecewise_filenames(filenames, "./data/FileLists/", 1024);
+
+	 //TK::tk_dump_filename(filenames, "./data/faceimages.filenames");
+
+
+	 //FileParser* parser = new FileParser(m_infolder, "./data/FileLists/");
+
+	// parser->DumpImageFileNames(FileParser::USE_SPLIT_FILES);
+
+	 system("pause");
+
+	 return 0;
 }
