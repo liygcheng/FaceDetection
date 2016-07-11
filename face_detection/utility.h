@@ -91,6 +91,9 @@ namespace TK{
 
 	static bool tk_dump_filenames(const std::vector<std::string> &filenames,const char* outname,size_t baseCount = 0){
 
+
+		std::cout << "filename = " << outname << std::endl;
+
 		std::ofstream out(outname);
 
 		if (!out) { std::cerr << "open file error,aborting.." << std::endl; return false; }
@@ -109,9 +112,22 @@ namespace TK{
 	
 	static bool tk_dump_piecewise_filenames(const std::vector<std::string> &filenames,const char* outfolder,size_t numPerSegment){
 
+
 		size_t file_len = filenames.size();
 
 		assert(file_len);
+
+		/// Generating configure.txt
+		std::string constr(outfolder);
+		std::ofstream  txt(constr.append("configure.txt"));
+
+		std::cout << constr << std::endl;
+		if (!txt)  { std::cerr << "open file error,aborting.." << std::endl; return false; }
+
+
+		txt << outfolder << " " << file_len << std::endl;
+
+		///
 
 		size_t max_batch_num = file_len / (numPerSegment);
 
@@ -123,8 +139,13 @@ namespace TK{
 
 			std::vector<std::string>  subfilename(&filenames[startIdx], &filenames[endIdx]);
 			char* subname = new char[256]; //batch dump name
+	
 			memset(subname, 0, sizeof(subname));
+
+			//std::cout << "outfolder = " << sizeof(outfolder) << std::endl;
+
 			std::string tmp(outfolder);
+
 			std::sprintf(subname, tmp.append("%d-%d.filenames").c_str(), startIdx, endIdx);
 
 			if (_access(subname, 0) != -1)
@@ -132,12 +153,13 @@ namespace TK{
 				std::cout << "File " << subname << " already exists.\n" << std::endl;
 				continue;
 			}
+			txt << subname <<" "<<startIdx<<" "<<endIdx<< std::endl;
 
 			TK::tk_dump_filenames(subfilename, subname, startIdx);
 
 		}
 
-
+		txt.close();
 
 		return true;
 	}

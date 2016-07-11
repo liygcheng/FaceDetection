@@ -165,7 +165,7 @@ void Test(void){
 int main(void)
 {
 
-	const char* m_infolder = "C:/Project/data/portrait/selected/";
+	const char* m_infolder = "D:/Arcsoft/data/portrait/big_results/results/";
 	const char* m_outfoler = "./data/";
 	//CheckForPath(m_outfoler);
 
@@ -300,11 +300,11 @@ int main(void)
 
 	// Test();
 
-	 std::vector<std::string> filenames;
+	 //std::vector<std::string> filenames;
 
-	 TK::tk_get_filenames(m_infolder, filenames, "jpg");
+	 //TK::tk_get_filenames(m_infolder, filenames, "jpg");
 
-	 TK::tk_dump_piecewise_filenames(filenames, "./data/FileLists/", 1024);
+	 //TK::tk_dump_piecewise_filenames(filenames, "D:/Arcsoft/data/portrait/big_results/filelists/", 2000);
 
 	 //TK::tk_dump_filename(filenames, "./data/faceimages.filenames");
 

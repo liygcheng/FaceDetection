@@ -109,6 +109,7 @@ public:
 
 	virtual void DetectMessage();
 
+
 	virtual bool ElicitMessage(const char* in_proto_name);
 
 

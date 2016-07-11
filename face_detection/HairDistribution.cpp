@@ -465,6 +465,8 @@ void Detector::DetectMessage(void)
 
 }
 
+
+
 bool Detector::ElicitMessage(const char* in_proto_name)
 {
 	//TK::PBErrorCollector errorCollector;
