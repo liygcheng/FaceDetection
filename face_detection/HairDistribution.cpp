@@ -194,6 +194,8 @@ bool Detector::Initialize(void)
 	m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
 	m_faceinfos_ref = m_faceinfos->GetReflection();// is this so called Reflection ?
 
+	m_faceinfos_ref->SetString(m_faceinfos, m_faceinfos_des->FindFieldByCamelcaseName("rootFolder"), m_infolder);
+
 	return true;
 }
 
@@ -283,9 +285,9 @@ void Detector::DetectMessage(void)
 		std::string basename = m_basename[i];
 
 
-		m_field = m_faceinfo_des->FindFieldByName("filename");
+		//m_field = m_faceinfo_des->FindFieldByName("filename");
 
-		m_faceinfo_ref->SetString(m_faceinfo, m_field,filename);
+		//m_faceinfo_ref->SetString(m_faceinfo, m_field,filename);
 		m_field = m_faceinfo_des->FindFieldByName("basename");
 		m_faceinfo_ref->SetString(m_faceinfo, m_field, basename);
 
@@ -327,11 +329,11 @@ void Detector::DetectMessage(void)
 		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startY"), m_rect[0].tl().y);
 		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endX"), m_rect[0].br().x);
 		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endY"), m_rect[0].tl().y);
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x) / 2);
-		m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y) / 2);
+		//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x) / 2);
+		//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y) / 2);
 
-		m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
-		m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
+		//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
+		//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
 		
 
 		m_field = m_faceinfo_des->FindFieldByName("box");	
@@ -385,15 +387,7 @@ void Detector::DetectMessage(void)
 
 #ifdef  LOG_INFO
 
-		std::cout << "faceinfo->state = " << m_faceinfo_ref->GetBool(*m_faceinfo, m_faceinfo_des->FindFieldByName("state")) << std::endl;
-		std::cout << "faceinfo->filename = " << m_faceinfo_ref->GetString(*m_faceinfo, m_faceinfo_des->FindFieldByName("filename")) << std::endl;
-		std::cout << "faceinfo->base = " << m_faceinfo_ref->GetString(*m_faceinfo, m_faceinfo_des->FindFieldByName("basename")) << std::endl;
 
-
-		//m_faceinfo_ref->GetRepeatedMessage(*m_faceinfo, m_faceinfo_des->FindFieldByName("landmark"), 68);
-		
-		std::cout << "SpaceUsed cout = " << m_faceinfo_ref->SpaceUsed(*m_faceinfo) << std::endl;
-		std::cout << "SpaceUsed cout = " << m_faceinfos_ref->SpaceUsed(*m_faceinfos) << std::endl;
 
 
 

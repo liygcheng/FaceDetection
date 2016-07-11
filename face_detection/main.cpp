@@ -165,7 +165,7 @@ void Test(void){
 int main(void)
 {
 
-	const char* m_infolder = "D:/Arcsoft/data/portrait/test/test/";
+	const char* m_infolder = "C:/Project/data/portrait/selected/";
 	const char* m_outfoler = "./data/";
 	//CheckForPath(m_outfoler);
 
@@ -278,7 +278,7 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+	 Detector* m_detector = new Detector(m_infolder, "faceinfos_2016_7_11", m_outfoler);
 
 	 m_detector->ElicitFilenamesFromInfolder();
 
