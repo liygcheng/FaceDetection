@@ -5,7 +5,7 @@
 
 	message FaceInfo{
 		required bool state = 1;
-		required string basename = 2;
+		required string filename = 2;
 		optional BoundingBox box = 3;
 		repeated LandMark landmark = 4;
 	}

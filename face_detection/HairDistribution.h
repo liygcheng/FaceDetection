@@ -107,8 +107,10 @@ public:
 	virtual void ElicitFilenamesFromInfolder(void); // get filenames(full path) from  in folder
 	virtual void CopyImage(const std::string infile, const std::string outfile);// single file  copy
 
-	virtual void DetectMessage();
+	virtual void DetectMessage(void);
 
+
+	virtual void DetectMessageByPiecewise(const char* configurefile);
 
 	virtual bool ElicitMessage(const char* in_proto_name);
 
@@ -146,7 +148,7 @@ private:
 
 	enum 
 	{
-		PATCH_WISE_NUM = 1000,
+		PATCH_WISE_NUM = 2000,
 		MAX_THREADS_NUM = 10
 	};
 

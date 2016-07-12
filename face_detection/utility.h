@@ -119,17 +119,20 @@ namespace TK{
 
 		/// Generating configure.txt
 		std::string constr(outfolder);
+
 		std::ofstream  txt(constr.append("configure.txt"));
 
 		std::cout << constr << std::endl;
 		if (!txt)  { std::cerr << "open file error,aborting.." << std::endl; return false; }
 
 
-		txt << outfolder << " " << file_len << std::endl;
+		
 
 		///
 
 		size_t max_batch_num = file_len / (numPerSegment);
+
+		txt << outfolder << " " << max_batch_num+1 << std::endl;
 
 		for (size_t batch_num = 0; batch_num <= max_batch_num; ++batch_num)
 		{
@@ -151,6 +154,7 @@ namespace TK{
 			if (_access(subname, 0) != -1)
 			{
 				std::cout << "File " << subname << " already exists.\n" << std::endl;
+				txt << subname << " " << startIdx << " " << endIdx << std::endl;
 				continue;
 			}
 			txt << subname <<" "<<startIdx<<" "<<endIdx<< std::endl;

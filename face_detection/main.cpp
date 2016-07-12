@@ -278,7 +278,9 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 //Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+
+	 m_detector->DetectMessageByPiecewise("D:/Arcsoft/data/portrait/big_results/filelists/configure.txt");
 
 	 //m_detector->ElicitFilenamesFromInfolder();
 
@@ -300,14 +302,15 @@ int main(void)
 
 	// Test();
 
-	 //std::vector<std::string> filenames;
+	/* std::vector<std::string> filenames;
 
-	 //TK::tk_get_filenames(m_infolder, filenames, "jpg");
+	 TK::tk_get_filenames(m_infolder, filenames, "jpg");
 
-	 //TK::tk_dump_piecewise_filenames(filenames, "D:/Arcsoft/data/portrait/big_results/filelists/", 2000);
+	 TK::tk_dump_piecewise_filenames(filenames, "D:/Arcsoft/data/portrait/big_results/filelists/", 2000);*/
 
 	 //TK::tk_dump_filename(filenames, "./data/faceimages.filenames");
 
+	
 
 	 //FileParser* parser = new FileParser(m_infolder, "./data/FileLists/");
 

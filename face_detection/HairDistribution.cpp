@@ -465,10 +465,216 @@ void Detector::DetectMessage(void)
 
 }
 
+void Detector::DetectMessageByPiecewise(const char* configurefile)
+{
+	std::ifstream config(configurefile);
 
+	if (!config){ std::cerr << "Open configure file error." << std::endl; return; }
+
+	std::string imageFolder,imageFiles;
+
+	size_t batchNum, startIdx, endIdx;
+
+	//std::getline(config, imageFolder);
+
+	config >> imageFolder >> batchNum;
+
+	while (config.peek() != EOF)
+	{
+		//  get image names  from configure files
+		config >> imageFiles >> startIdx >> endIdx;
+
+		std::cout << "imageFiles = " << imageFiles << std::endl;
+		std::ifstream patchFile(imageFiles);
+
+		if (!patchFile) { std::cerr << "Open filenames file error." << std::endl; continue; }
+
+		std::vector<std::string > imagenames;
+		imagenames.reserve(PATCH_WISE_NUM + 40);
+		std::string tmp;
+		size_t idx;
+
+
+		while (patchFile.peek()!= EOF)
+		{
+			patchFile >> tmp >> idx;
+			imagenames.push_back(tmp);
+		}
+
+		//  get image names  from configure files
+
+
+		std::cout << "imagenames : " << imagenames.size() << std::endl;
+		// generating dump string name
+		imageFolder.pop_back(); //get rid of /
+
+		std::string subname;
+		size_t dumpiter = imageFolder.find_last_of("/");
+
+		if (dumpiter == imageFolder.size())
+		{
+			std::cout << "Find   no  /" << std::endl;
+			continue;
+		}
+		subname.assign(imageFolder.substr(0, dumpiter));
+		//std::cout << "root path : " << subname.append("/imageinfos/") << std::endl;
+
+		imageFolder.push_back('/');// add /
+
+
+		char* subname_ = new char[256]; //batch dump name
+		memset(subname_, 0, sizeof(subname_));
+		
+		std::sprintf(subname_, subname.append("/imageinfos/%d-%d.faceinfos").c_str(), startIdx, endIdx);
+
+		// generating dump string name
+
+		std::cout << "subname_  = " << subname_ << std::endl;
+
+
+
+
+		m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_des)->New();
+		m_faceinfos_ref = m_faceinfos->GetReflection();// is this so called Reflection ?
+
+		m_faceinfos_ref->SetString(m_faceinfos, m_faceinfos_des->FindFieldByName("rootFolder"), imageFolder);
+
+		size_t len = imagenames.size();
+
+		for (size_t i = 0; i < len; ++i)
+		{
+			//if (i% ==0 )
+			std::cout << "count = " << i << " batch = "<<startIdx <<" -- "<<endIdx<< std::endl;
+
+			m_field = m_faceinfos_des->FindFieldByName("info");
+
+			m_faceinfo = m_faceinfos_ref->AddMessage(m_faceinfos, m_field);
+			m_faceinfo_des = m_faceinfo->GetDescriptor();
+			m_faceinfo_ref = m_faceinfo->GetReflection();
+
+
+			m_boundingbox = m_messageFactory->GetPrototype(m_boundingbox_des)->New();
+			m_boundingbox_ref = m_boundingbox->GetReflection();
+
+
+			std::string filename = imagenames[i];
+			//std::string basename = subbasename[i];
+
+			m_field = m_faceinfo_des->FindFieldByName("filename");
+			m_faceinfo_ref->SetString(m_faceinfo, m_field, filename);
+
+			cv::Mat m_image = cv::imread(filename);
+			if ((!m_image.data) || (m_image.channels() != 3)) // state = false;
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+
+				continue;
+			}
+
+
+			int w = m_image.cols - (m_image.cols & 1);
+			int h = m_image.rows - (m_image.rows & 1);
+			cv::Mat tmp = m_image(Rect(0, 0, w, h));
+
+
+			vecR m_rect;
+			CxFaceDA::ArcSoftFaceDetection(tmp, 2, 5, m_rect);
+
+			if (m_rect.size() != 1)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+				continue;
+			}
+
+			// Set up bounding box
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startX"), m_rect[0].tl().x);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("startY"), m_rect[0].tl().y);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endX"), m_rect[0].br().x);
+			m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("endY"), m_rect[0].br().y);
+			//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidX"), (m_rect[0].tl().x + m_rect[0].br().x) / 2);
+			//m_boundingbox_ref->SetInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("centroidY"), (m_rect[0].tl().y + m_rect[0].br().y) / 2);
+			//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("width"), m_rect[0].br().x - m_rect[0].tl().x);
+			//m_boundingbox_ref->SetUInt32(m_boundingbox, m_boundingbox_des->FindFieldByName("height"),m_rect[0].br().y - m_rect[0].tl().x);
+
+			m_field = m_faceinfo_des->FindFieldByName("box");
+			m_faceinfo_ref->SetAllocatedMessage(m_faceinfo, m_boundingbox, m_field);
+
+			vecP2d  m_keyPoints;
+			CxFaceDA::ArcSoftFaceAlignment(tmp, 5, m_keyPoints);
+
+			size_t key_len = m_keyPoints.size();
+			if (key_len == 0)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("state");
+				m_faceinfo_ref->SetBool(m_faceinfo, m_field, false);
+				continue;
+			}
+
+			for (size_t k = 0; k < key_len; ++k)
+			{
+				m_field = m_faceinfo_des->FindFieldByName("landmark");
+
+				m_landmark = m_faceinfo_ref->AddMessage(m_faceinfo, m_field);
+				m_landmark_des = m_landmark->GetDescriptor();
+				m_landmark_ref = m_landmark->GetReflection();
+
+				m_field = m_landmark_des->FindFieldByName("id");
+				m_landmark_ref->SetUInt32(m_landmark, m_field, k + 1);
+
+				m_field = m_landmark_des->FindFieldByName("X");
+				m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][0]));
+
+				m_field = m_landmark_des->FindFieldByName("Y");
+				m_landmark_ref->SetInt32(m_landmark, m_field, static_cast<google::protobuf::int32>(m_keyPoints[k][1]));
+
+			}
+
+
+			m_field = m_faceinfo_des->FindFieldByName("state");
+			m_faceinfo_ref->SetBool(m_faceinfo, m_field, true);
+
+
+
+			//Log info
+
+#ifdef  LOG_INFO
+
+
+
+
+
+			//Log info
+#endif
+			//filename.clear();
+			//basename.clear();
+			m_image.release();
+			m_rect.clear();
+			m_keyPoints.clear();
+			tmp.release();
+
+		}
+
+
+
+
+		TK::PB_Writer(subname_, m_faceinfos);
+		if (!m_faceinfos) m_faceinfos->Clear();
+		//Clear();
+
+		patchFile.close();
+	}
+
+
+	config.close();
+
+
+}
 
 bool Detector::ElicitMessage(const char* in_proto_name)
 {
+
 	//TK::PBErrorCollector errorCollector;
 	//google::protobuf::compiler::DiskSourceTree diskSourceTree;
 	//m_importer = new google::protobuf::compiler::Importer(&diskSourceTree, &errorCollector);
