@@ -792,4 +792,67 @@ Detector::~Detector()
 //	return (size_t)0;
 //}
 
+/************************************************************************/
+/* FaceShape                                                                     */
+/************************************************************************/
+cv::Mat_<double>& FaceShape::GetMeanShape(void)
+{
+	
+		size_t len = m_imageinfos.size();
+
+		m_shapeNum = 0;
+
+		for (size_t t = 0; t < len; ++t)
+		{
+
+			if (!m_faceinfos)  m_faceinfos->Clear();
+
+			TK::PB_Reader(m_imageinfos[t].c_str(), m_faceinfos);
+			m_faceinfos_desc = m_faceinfos->GetDescriptor();
+			m_faceinfos_ref = m_faceinfos->GetReflection();
+
+			m_field = m_faceinfos_desc->FindFieldByName("info");
+
+			size_t  imageNum = m_faceinfos_ref->FieldSize(*m_faceinfos, m_field);
+
+			for (size_t i = 0; i < imageNum;++i)
+			{
+
+				m_faceinfo = &(m_faceinfos_ref->GetRepeatedMessage(*m_faceinfos, m_field, i));
+
+				cv::Mat_<double> raw;
+				cv::Mat_<double> center;
+
+				if (TK::tk_centralization(m_faceinfo,center,raw))
+				{
+					std::cout << " OK " << std::endl;
+				}
+				else
+				{
+					std::cout << "No keypoints" << std::endl;
+				}
+
+				int a = 1;
+
+			}
+
+			
+
+
+
+
+
+
+
+
+
+		}
+
+
+
+
+	
+		return m_meanShape;
+
+}
 

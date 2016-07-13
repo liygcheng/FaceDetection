@@ -318,6 +318,102 @@ private:
 //
 //};
 
+//////////////////////////////////////////////////////////////////////////
+/************************************************************************/
+/*						 face shape rectify                                                                     */
+/************************************************************************/
+
+
+class FaceShape
+{
+public:
+	FaceShape(const char* infolder):m_infolder(infolder){
+	if (!Initial())
+	{
+		std::cout << "Initial incomplete." << std::endl;
+		exit(-1);
+	}
+	
+	};
+	virtual ~FaceShape(){};
+
+public:
+	//initialize step
+	inline virtual bool Initial(void){
+		m_imageinfos.reserve(200);
+		m_meanShape.reserve(100);
+		m_shape.reserve(100);
+
+		TK::tk_get_filenames(m_infolder.c_str(), m_imageinfos, "faceinfos");
+
+	
+	
+		return true;
+	};
+
+
+	cv::Mat_<double> & GetMeanShape(void);
+
+
+
+public:
+
+	inline google::protobuf::Message* & getMessage(const char* &filename)
+	{
+		TK::PB_Reader(filename, m_faceinfos);
+
+		return m_faceinfos;
+	}
+
+	
+
+
+
+public://some test for inner var
+	inline bool isMeanShapeExists(void){ return !m_meanShape.empty(); };
+
+
+private:
+
+	std::string  m_infolder;
+
+	std::vector<std::string>  m_imageinfos;
+
+
+
+	cv::Mat_<double>  m_meanShape;
+
+	cv::Mat_<double>  m_shape;
+
+
+	size_t m_shapeNum;
+
+
+	/************************************************************************/
+	/* protocol buffer variable                                                                      */
+	/************************************************************************/
+	google::protobuf::Message* m_faceinfos = NULL;
+	const google::protobuf::Descriptor* m_faceinfos_desc = NULL;
+	const google::protobuf::Reflection* m_faceinfos_ref = NULL;
+
+    const google::protobuf::Message* m_faceinfo = NULL;
+	const google::protobuf::Descriptor* m_faceinfo_desc = NULL;
+	const google::protobuf::Reflection* m_faceinfo_ref = NULL;
+
+
+	const google::protobuf::FieldDescriptor* m_field = NULL;
+
+
+};
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
 
 
 
