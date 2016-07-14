@@ -55,8 +55,8 @@ namespace TK{
 		long m_lf;
 
 		std::string m_path(infolder);
-		m_path.append("/*.").append(suffix);
-
+		//m_path.append("*.").append(suffix);
+		m_path.append("*");
 		if ((m_lf = _findfirst(m_path.c_str(), &m_file)) == -1l)
 			std::cout << "No files  to be found! Please  check it again!" << std::endl;
 		else
@@ -365,8 +365,40 @@ namespace TK{
 	}
 	 
 
+	static  bool tk_is_file_existed(const char* filename)
+	{
+		if (_access(filename, 0) != -1)
+		{
+			std::cout << "File " << filename << " already exists.\n" << std::endl;
+			return true;
+		}
 
+		return false;
+	}
 
+	static  bool  tk_show_keypoints(cv::Mat_<double> mat)
+	{
+		cv::Mat   bg = cv::Mat::ones(500, 500, CV_64FC1);
 
+		mat = mat * 250 + 250;
+
+		for ( int i = 0; i < mat.rows; ++i)
+		{
+			cv::circle(bg, cv::Point2d((mat[i][0]),(mat[i][1])), 5, CV_RGB(255, 0, 0));
+		}
+
+		//rectangle(tmp, m_rect[0], CV_RGB(0, 255, 0));
+		//cv::namedWindow("Face Detect");
+		//cvNamedWindow("MyImg");
+		//cv::imshow("Face Detect", tmp);
+		//cvShowImage("Face Detect", tmp);
+
+	
+		cv::imshow("mean face", bg);
+
+		cv::waitKey(0);
+
+		return true;
+	}
 
 }

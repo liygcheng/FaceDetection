@@ -317,11 +317,20 @@ int main(void)
 	// parser->DumpImageFileNames(FileParser::USE_SPLIT_FILES);
 
 
-	 FaceShape* faceshape = new FaceShape("D:/Arcsoft/data/portrait/big_results/imageinfos/");
+	 //FaceShape* faceshape = new FaceShape("D:/Arcsoft/data/portrait/big_results/imageinfos/");
 
-	 cv::Mat_<double> meanshape = faceshape->GetMeanShape();
+	 //cv::Mat_<double> meanshape = faceshape->GetMeanShape();
 
-	
+	 cv::Mat_<double> mat = cv::Mat::zeros(95,2,CV_64FC1);
+
+	 std::ifstream in("./data/meanshape.txt");
+	 for (size_t i = 0; i < mat.rows; i++)
+	 {
+		 in >> mat[i][0] >> mat[i][1];
+	 }
+	 in.close();
+
+	 TK::tk_show_keypoints(mat);
 
 
 

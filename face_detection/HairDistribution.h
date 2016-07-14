@@ -354,7 +354,14 @@ public:
 
 	cv::Mat_<double> & GetMeanShape(void);
 
+	virtual void  GetScaleAndRotation(void);
 
+
+	virtual void  SimilarityTransform(const cv::Mat_<double>& shape1, const cv::Mat_<double>& shape2,
+		cv::Mat_<double>& rotation, double& scale);
+
+	virtual double calculate_covariance(const vector<double>& v_1,
+		const vector<double>& v_2);
 
 public:
 
@@ -388,7 +395,7 @@ public://some test for inner var
 private:
 
 	std::string  m_infolder;
-
+	      
 	std::vector<std::string>  m_imageinfos;
 
 

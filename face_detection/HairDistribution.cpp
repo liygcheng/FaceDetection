@@ -821,6 +821,15 @@ cv::Mat_<double>& FaceShape::GetMeanShape(void)
 			size_t e = m_imageinfos[t].find_first_of(".");
 
 			midname.append(m_imageinfos[t].substr(s, e)).append(".txt");
+
+			if (TK::tk_is_file_existed(midname.c_str()))
+			{
+				std::cout << "File already exists: " << midname << std::endl;
+				continue;
+			}
+				
+
+
 			size_t num = 0;
 			cv::Mat_<double> temp = cv::Mat::zeros(95, 2, CV_64FC1);
 			
@@ -897,3 +906,81 @@ cv::Mat_<double>& FaceShape::GetMeanShape(void)
 
 }
 
+ void FaceShape::GetScaleAndRotation(void)
+{
+
+
+
+
+
+}
+
+void FaceShape::SimilarityTransform(const cv::Mat_<double>& shape1, const cv::Mat_<double>& shape2,
+	cv::Mat_<double>& rotation, double& scale){
+	rotation = cv::Mat::zeros(2, 2, CV_64FC1);
+	scale = 0;
+
+	// center the data
+	double center_x_1 = 0;
+	double center_y_1 = 0;
+	double center_x_2 = 0;
+	double center_y_2 = 0;
+	for (int i = 0; i < shape1.rows; i++){
+		center_x_1 += shape1(i, 0);
+		center_y_1 += shape1(i, 1);
+		center_x_2 += shape2(i, 0);
+		center_y_2 += shape2(i, 1);
+	}
+	center_x_1 /= shape1.rows;
+	center_y_1 /= shape1.rows;
+	center_x_2 /= shape2.rows;
+	center_y_2 /= shape2.rows;
+
+	cv::Mat_<double> temp1 = shape1.clone();
+	cv::Mat_<double> temp2 = shape2.clone();
+	for (int i = 0; i < shape1.rows; i++){
+		temp1(i, 0) -= center_x_1;
+		temp1(i, 1) -= center_y_1;
+		temp2(i, 0) -= center_x_2;
+		temp2(i, 1) -= center_y_2;
+	}
+
+
+	cv::Mat_<double> covariance1, covariance2;
+	cv::Mat_<double> mean1, mean2;
+	// calculate covariance matrix
+	calcCovarMatrix(temp1, covariance1, mean1, CV_COVAR_COLS);
+	calcCovarMatrix(temp2, covariance2, mean2, CV_COVAR_COLS);
+
+	double s1 = sqrt(norm(covariance1));
+	double s2 = sqrt(norm(covariance2));
+	scale = s1 / s2;
+	temp1 = 1.0 / s1 * temp1;
+	temp2 = 1.0 / s2 * temp2;
+
+	double num = 0;
+	double den = 0;
+	for (int i = 0; i < shape1.rows; i++){
+		num = num + temp1(i, 1) * temp2(i, 0) - temp1(i, 0) * temp2(i, 1);
+		den = den + temp1(i, 0) * temp2(i, 0) + temp1(i, 1) * temp2(i, 1);
+	}
+
+	double norm = sqrt(num*num + den*den);
+	double sin_theta = num / norm;
+	double cos_theta = den / norm;
+	rotation(0, 0) = cos_theta;
+	rotation(0, 1) = -sin_theta;
+	rotation(1, 0) = sin_theta;
+	rotation(1, 1) = cos_theta;
+}
+
+double FaceShape::calculate_covariance(const vector<double>& v_1,
+	const vector<double>& v_2){
+	cv::Mat_<double> v1(v_1);
+	cv::Mat_<double> v2(v_2);
+	double mean_1 = mean(v1)[0];
+	double mean_2 = mean(v2)[0];
+	v1 = v1 - mean_1;
+	v2 = v2 - mean_2;
+	return mean(v1.mul(v2))[0];
+}
