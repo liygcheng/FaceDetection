@@ -346,7 +346,7 @@ public:
 
 		TK::tk_get_filenames(m_infolder.c_str(), m_imageinfos, "faceinfos");
 
-	
+		InitialMessage(m_faceinfos);
 	
 		return true;
 	};
@@ -358,11 +358,23 @@ public:
 
 public:
 
-	inline google::protobuf::Message* & getMessage(const char* &filename)
+	inline void InitialMessage(google::protobuf::Message* & m_faceinfos)
 	{
-		TK::PB_Reader(filename, m_faceinfos);
+	
 
-		return m_faceinfos;
+		char* protoname = "landmark.proto";
+
+		TK::PB_Initialize(protoname, importer, filedesc);
+
+
+		m_faceinfos_desc = filedesc->pool()->FindMessageTypeByName("FaceInfos");
+		
+
+		google::protobuf::MessageFactory* m_messageFactory = new google::protobuf::DynamicMessageFactory(filedesc->pool());
+
+		m_faceinfos = m_messageFactory->GetPrototype(m_faceinfos_desc)->New();
+
+	
 	}
 
 	
@@ -392,6 +404,10 @@ private:
 	/************************************************************************/
 	/* protocol buffer variable                                                                      */
 	/************************************************************************/
+	const google::protobuf::FileDescriptor* filedesc = NULL;
+	google::protobuf::compiler::Importer* importer = NULL;
+
+
 	google::protobuf::Message* m_faceinfos = NULL;
 	const google::protobuf::Descriptor* m_faceinfos_desc = NULL;
 	const google::protobuf::Reflection* m_faceinfos_ref = NULL;

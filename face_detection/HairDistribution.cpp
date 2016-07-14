@@ -802,21 +802,43 @@ Detector::~Detector()
 /************************************************************************/
 cv::Mat_<double>& FaceShape::GetMeanShape(void)
 {
-	
+		
 		size_t len = m_imageinfos.size();
 
 		m_shapeNum = 0;
 
+		std::string midshape("D:/Arcsoft/data/portrait/big_results/midResults/");
+
+		m_meanShape = cv::Mat::zeros(95, 2, CV_64FC1);
+
 		for (size_t t = 0; t < len; ++t)
 		{
+			//dump
 
-			if (!m_faceinfos)  m_faceinfos->Clear();
+			std::string  midname(midshape);
+
+			size_t s = m_imageinfos[t].find_last_of("/")+1;
+			size_t e = m_imageinfos[t].find_first_of(".");
+
+			midname.append(m_imageinfos[t].substr(s, e)).append(".txt");
+			size_t num = 0;
+			cv::Mat_<double> temp = cv::Mat::zeros(95, 2, CV_64FC1);
+			
+
+			//mid dump
+			
+			std::cout << "m_imageinfos[t] = " << m_imageinfos[t].substr(s,e) << std::endl;
 
 			TK::PB_Reader(m_imageinfos[t].c_str(), m_faceinfos);
+
 			m_faceinfos_desc = m_faceinfos->GetDescriptor();
 			m_faceinfos_ref = m_faceinfos->GetReflection();
 
 			m_field = m_faceinfos_desc->FindFieldByName("info");
+
+			
+			//
+
 
 			size_t  imageNum = m_faceinfos_ref->FieldSize(*m_faceinfos, m_field);
 
@@ -830,29 +852,43 @@ cv::Mat_<double>& FaceShape::GetMeanShape(void)
 
 				if (TK::tk_centralization(m_faceinfo,center,raw))
 				{
-					std::cout << " OK " << std::endl;
+					//std::cout << " OK " << std::endl;
+					++m_shapeNum;
+					++num;
+					m_meanShape = m_meanShape + center;
+					temp = temp + center;
 				}
 				else
 				{
 					std::cout << "No keypoints" << std::endl;
 				}
 
-				int a = 1;
-
 			}
 
-			
+			temp = temp / num;
+			//dump  meanshape
+
+			std::ofstream tmp(midname);
+			tmp << num << std::endl;
+
+			for (size_t i = 0; i < temp.rows; ++i)
+			{
+				tmp << temp[i][0] << " " << temp[i][1] << std::endl;
+			}
+			tmp.close();
 
 
-
-
-
-
-
-
+			if (!m_faceinfos)  m_faceinfos->Clear();
 
 		}
 
+		m_meanShape = m_meanShape / m_shapeNum;
+		std::ofstream ms("./data/meanshape.txt");
+		for (size_t i = 0; i < m_meanShape.rows; ++i)
+		{
+			ms << m_meanShape[i][0] << " " << m_meanShape[i][1] << std::endl;
+		}
+		ms.close();
 
 
 

@@ -278,9 +278,9 @@ int main(void)
 
 #endif // TEST_PROTOBUF
 
-	 Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
+	 //Detector* m_detector = new Detector(m_infolder, "faceinfos", m_outfoler);
 
-	 m_detector->DetectMessageByPiecewise("D:/Arcsoft/data/portrait/big_results/filelists/configure.txt");
+	 //m_detector->DetectMessageByPiecewise("D:/Arcsoft/data/portrait/big_results/filelists/configure.txt");
 
 	 //m_detector->ElicitFilenamesFromInfolder();
 
@@ -316,7 +316,14 @@ int main(void)
 
 	// parser->DumpImageFileNames(FileParser::USE_SPLIT_FILES);
 
-	 system("pause");
+
+	 FaceShape* faceshape = new FaceShape("D:/Arcsoft/data/portrait/big_results/imageinfos/");
+
+	 cv::Mat_<double> meanshape = faceshape->GetMeanShape();
+
+	
+
+
 
 	 return 0;
 }

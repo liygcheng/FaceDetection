@@ -26,7 +26,7 @@
 
 #define TK_USE_OPENMP
 
-#define SHOW_FACE_INFO
+//#define SHOW_FACE_INFO
 
 namespace TK{
 
@@ -214,7 +214,7 @@ namespace TK{
 
 	}
 
-	static void PB_Initialize(const char* root, const char* filename, google::protobuf::compiler::Importer*& importer,const google::protobuf::FileDescriptor*& filedescripter){
+	static void PB_Initialize(const char* filename, google::protobuf::compiler::Importer*& importer,const google::protobuf::FileDescriptor*& filedescripter){
 
 		TK::PBErrorCollector errorCollector ;
 		google::protobuf::compiler::DiskSourceTree diskSourceTree;
@@ -222,7 +222,7 @@ namespace TK{
 
 	   importer = new google::protobuf::compiler::Importer(&diskSourceTree,&errorCollector);
 
-	   diskSourceTree.MapPath("", root);
+	   diskSourceTree.MapPath("", "./protobuf");
 
 	   filedescripter = importer->Import(filename);
 
@@ -236,6 +236,11 @@ namespace TK{
 		 
 		 std::fstream outfile(filename, std::ios::out | std::ios::binary);
 		 
+		 if (!outfile)
+		 {
+			 std::cout << "Open File Error" << std::endl;
+		 }
+
 		 if (!message->SerializeToOstream(&outfile)) {
 			 std::cerr << "Failed to write msg." << std::endl;
 			 return false;
@@ -249,6 +254,10 @@ namespace TK{
 
 
 		std::fstream input(filename, std::ios::in | std::ios::binary);
+		if (!input)
+		{
+			std::cout << "Open File Error" << std::endl;
+		}
 		 if (!message->ParseFromIstream(&input)) {
 			 std::cerr << "Failed to parse message." << std::endl;
 			 input.close();
@@ -316,6 +325,10 @@ namespace TK{
 			
 				 center[t][0] = (raw[t][0] - center_X) / (width / 2.0);
 				 center[t][1] = (raw[t][1] - center_Y) / (height / 2.0);
+
+				// std::cout << "x = " << center[t][0] << std::endl;
+				// std::cout << "y = " << center[t][0] << std::endl;
+
 			 }
 
 #ifdef SHOW_FACE_INFO
@@ -351,5 +364,9 @@ namespace TK{
 
 	}
 	 
+
+
+
+
 
 }
