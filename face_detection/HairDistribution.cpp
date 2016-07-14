@@ -531,6 +531,11 @@ void Detector::DetectMessageByPiecewise(const char* configurefile)
 
 		std::cout << "subname_  = " << subname_ << std::endl;
 
+		if (_access(subname_, 0) != -1)
+		{
+			std::cout << "File " << subname_ << " already exists.\n" << std::endl;
+			continue;
+		}
 
 
 
