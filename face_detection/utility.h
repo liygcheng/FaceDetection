@@ -26,6 +26,8 @@
 
 #define TK_USE_OPENMP
 
+#define SHOW_FACE_INFO
+
 namespace TK{
 
 	class PBErrorCollector:public google::protobuf::compiler::MultiFileErrorCollector
@@ -258,26 +260,96 @@ namespace TK{
 
 	static void PB_Print(const google::protobuf::Message& message)
 	{
-		//std::cout << "********************************************" << std::endl;
-		//std::cout << " state    = "<<message.state()<< std::endl;
+	
 
-		//std::cout << " filename = "<<message.filename() << std::endl;
-
-		//std::cout << " basename = "<<message.basename() << std::endl;
-
-		//std::cout << " startX = "<<message.box().startx() <<" endX = "<<message.box().endx()<< std::endl;
-		//std::cout << " startY = " << message.box().starty() <<" endY = "<<message.box().endy()<< std::endl;
-		//std::cout << " centroidX = "<<message.box().centroidx() <<" centroidY = "<<message.box().centroidy() << std::endl;
-		//std::cout << " width = "<<message.box().width() <<" height = "<<message.box().height() << std::endl;
-
-
-		//std::cout << " Face index =  "<<message.GetCachedSize()<< std::endl;
-
-		//std::cout << "********************************************" << std::endl;
 
 	}
 
+	static bool tk_centralization(const google::protobuf::Message* & msg,cv::Mat_<double>& center,cv::Mat_<double>& raw )
+	{
+		//center.release();
+		//raw.release();
 
+		
+
+		const google::protobuf::Descriptor* des = msg->GetDescriptor();
+		const google::protobuf::Reflection* ref = msg->GetReflection();
+
+		const google::protobuf::FieldDescriptor* field = NULL;
+
+		field = des->FindFieldByName("state");
+
+		bool  m_state = ref->GetBool(*msg, field);
+
+		if (m_state)
+		{
+			// get element
+			 field = des->FindFieldByName("box");
+			 const google::protobuf::Message* box =&( ref->GetMessage(*msg, field));
+			
+			 double startX = static_cast<double>(box->GetReflection()->GetInt32(*box, box->GetDescriptor()->FindFieldByName("startX")));
+			 double endX   = static_cast<double>(box->GetReflection()->GetInt32(*box, box->GetDescriptor()->FindFieldByName("endX")));
+			 double startY = static_cast<double>(box->GetReflection()->GetInt32(*box, box->GetDescriptor()->FindFieldByName("startY")));
+			 double endY   = static_cast<double>(box->GetReflection()->GetInt32(*box, box->GetDescriptor()->FindFieldByName("endY")));
+
+			 //
+			 double  width     = (endX - startX);
+			 double height     = (endY - startY);
+			 double center_X   = startX + width / 2.0;
+			 double center_Y   = startY + height / 2.0;
+			 //landmark
+			
+			 field = des->FindFieldByName("landmark");
+			 
+			 size_t len = ref->FieldSize(*msg, field);
+
+			 raw    = cv::Mat::zeros(len, 2, CV_64FC1);
+			 center = cv::Mat::zeros(len, 2, CV_64FC1);
+
+			
+
+			 for (size_t t = 0; t < len;++t)
+			 {
+				 const google::protobuf::Message* landmark = &(ref->GetRepeatedMessage(*msg, field, t));
+				 raw[t][0] =static_cast<double>( landmark->GetReflection()->GetInt32(*landmark, landmark->GetDescriptor()->FindFieldByName("X")));
+				 raw[t][1] =static_cast<double>( landmark->GetReflection()->GetInt32(*landmark, landmark->GetDescriptor()->FindFieldByName("Y")));
+			
+				 center[t][0] = (raw[t][0] - center_X) / (width / 2.0);
+				 center[t][1] = (raw[t][1] - center_Y) / (height / 2.0);
+			 }
+
+#ifdef SHOW_FACE_INFO
+
+			 std::string filename = ref->GetString(*msg, des->FindFieldByName("filename"));
+			 cv::Mat m_image = cv::imread(filename);
+			 if (!m_image.data)
+				 return false;
+			 if (m_image.channels() != 3)  //  get rid of non-color  images
+				 return false;
+
+
+			 for (int i = 0; i < raw.rows; ++i)
+			 {			
+				 cv::circle(m_image,cv::Point2d(raw[i][0],raw[i][1]), 3, CV_RGB(255, 0, 0));
+			 }
+	
+			 cv::namedWindow("Face Detect");		
+			 cv::imshow("Face Detect", m_image);
+			 cv::waitKey(0);
+
+
+
+#endif
+
+
+
+			 
+		}
+
+
+		return m_state;
+
+	}
 	 
 
 }
