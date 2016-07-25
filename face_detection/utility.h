@@ -401,4 +401,43 @@ namespace TK{
 		return true;
 	}
 
+	static bool tk_split_file(const std::string& filename, std::string& folder, std::string& basename)
+	{
+		size_t i = filename.find_last_of('/');
+
+		folder.assign(filename.substr(0, i + 1));
+		basename.assign(filename.substr(i + 1, filename.size()));
+		return true;
+	}
+
+	//transfer images  based on filenames in txt file filename
+	static bool tk_transfer_images(const char*filename,const char* outfolder)
+	{
+		std::ifstream in(filename);
+		if (!in)
+		{
+			std::cerr << "open file error." << std::endl;
+			return false;
+		}
+
+
+		std::string  temp,out;
+		size_t id;
+		std::string  root, base;
+		while (in.peek() != EOF)
+		{
+			in >> temp >> id;
+			std::cout<<"id = "<<id <<"  name = "<< temp << std::endl;
+			TK::tk_split_file(temp, root, base);
+			out.assign(outfolder).append(base);
+			TK::tk_copy_file(temp.c_str(), out.c_str());
+		}
+		in.close();
+
+		return true;
+	}
+
+
+
+
 }

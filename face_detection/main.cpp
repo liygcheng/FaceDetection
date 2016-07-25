@@ -164,9 +164,9 @@ void Test(void){
 
 int main(void)
 {
-
+	const char* filename = "D:/Arcsoft/data/portrait/big_results/filelists/2000-3999.filenames";
 	const char* m_infolder = "D:/Arcsoft/data/portrait/big_results/results/";
-	const char* m_outfoler = "./data/";
+	const char* m_outfoler = "D:/Arcsoft/data/portrait/big_results/Release/2000-3999/";
 	//CheckForPath(m_outfoler);
 
 #ifdef TEST_SELECTION
@@ -321,18 +321,26 @@ int main(void)
 
 	 //cv::Mat_<double> meanshape = faceshape->GetMeanShape();
 
-	 cv::Mat_<double> mat = cv::Mat::zeros(95,2,CV_64FC1);
+	 //cv::Mat_<double> mat = cv::Mat::zeros(95,2,CV_64FC1);
 
-	 std::ifstream in("./data/meanshape.txt");
-	 for (size_t i = 0; i < mat.rows; i++)
-	 {
-		 in >> mat[i][0] >> mat[i][1];
-	 }
-	 in.close();
+	 //std::ifstream in("./data/meanshape.txt");
+	 //for (size_t i = 0; i < mat.rows; i++)
+	 //{
+		// in >> mat[i][0] >> mat[i][1];
+	 //}
+	 //in.close();
 
-	 TK::tk_show_keypoints(mat);
+	 //TK::tk_show_keypoints(mat);
+
+//std::string root, basename;
+//TK::tk_split_file(m_infolder, root, basename);
+//
+//std::cout << "root = "<<root<<"  basename = "<<basename << std::endl;
+
+//TK::tk_transfer_images(filename,m_outfoler);
 
 
+system("pause");
 
 	 return 0;
 }
