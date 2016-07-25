@@ -81,7 +81,8 @@ private:
 	VlKMeans* m_kmeans;
 	vl_uint32 * m_dataAssignment;// range from 1 ~ m_dataNum
 	double* m_distance;
-
+	
+	DISABLE_COPY_AND_ASSIGN(Distributor);
 
 };
 
@@ -193,7 +194,7 @@ private:
 
 	
 
-
+	DISABLE_COPY_AND_ASSIGN(Detector);
 
 
 
@@ -384,29 +385,16 @@ public:
 	
 	}
 
-	
-
-
 
 public://some test for inner var
 	inline bool isMeanShapeExists(void){ return !m_meanShape.empty(); };
 
-
 private:
-
-	std::string  m_infolder;
-	      
+	std::string  m_infolder;	      
 	std::vector<std::string>  m_imageinfos;
-
-
-
 	cv::Mat_<double>  m_meanShape;
-
 	cv::Mat_<double>  m_shape;
-
-
 	size_t m_shapeNum;
-
 
 	/************************************************************************/
 	/* protocol buffer variable                                                                      */
@@ -426,6 +414,7 @@ private:
 
 	const google::protobuf::FieldDescriptor* m_field = NULL;
 
+	DISABLE_COPY_AND_ASSIGN(FaceShape);
 
 };
 

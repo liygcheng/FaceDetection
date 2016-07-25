@@ -24,6 +24,15 @@
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/dynamic_message.h>
 
+
+#define DISABLE_COPY_AND_ASSIGN(classname) \
+private:\
+  classname(const classname&);\
+  classname& operator=(const classname&)
+
+
+
+
 #define TK_USE_OPENMP
 
 //#define SHOW_FACE_INFO
@@ -246,7 +255,7 @@ namespace TK{
 			 return false;
 		 }
 		 outfile.close();
-		 return true;
+		 return true;  
 	 }
 
 	static bool PB_Reader(const char* filename,google::protobuf::Message*& message)
@@ -274,7 +283,7 @@ namespace TK{
 
 	}
 
-	static bool tk_centralization(const google::protobuf::Message* & msg,cv::Mat_<double>& center,cv::Mat_<double>& raw )
+	static  bool tk_centralization(const google::protobuf::Message* & msg,cv::Mat_<double>& center,cv::Mat_<double>& raw )
 	{
 		//center.release();
 		//raw.release();
