@@ -75,6 +75,10 @@ private:
 	std::vector<std::string> m_filenames;//full path,better to reserve enough capacity
 
 	std::vector<std::string> m_basename;//  basename  , not   full path
+
+	DISABLE_COPY_AND_ASSIGN(HairParser);
+
+
 };
 
 
